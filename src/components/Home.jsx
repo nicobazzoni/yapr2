@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, firestore } from '../../firebase';
 import Recorder from './Recorder';
+import Feed from './Feed';
 
 
 const Home = () => {
@@ -50,6 +51,7 @@ const Home = () => {
           
              <div>
             <Recorder />
+            <Feed />
            </div>
          
         </div>

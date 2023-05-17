@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { storageRef, auth  } from '../../firebase';
+import { storageRef, auth } from '../../firebase';
 
 const Recorder = () => {
   const [recording, setRecording] = useState(false);
   const [mediaStream, setMediaStream] = useState(null);
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [audioURL, setAudioURL] = useState(null);
+  const [recordedBlob, setRecordedBlob] = useState(null);
   const user = auth.currentUser;
+
   useEffect(() => {
     const initializeRecorder = async () => {
       try {
@@ -40,7 +42,6 @@ const Recorder = () => {
       setRecording(true);
     }
   };
-  
 
   const stopRecording = () => {
     if (mediaRecorder) {
@@ -50,24 +51,27 @@ const Recorder = () => {
       setRecording(false);
     }
   };
-  
 
-  const handleDataAvailable = async (event) => {
+  const handleDataAvailable = (event) => {
     const chunks = [];
     chunks.push(event.data);
-  
+
     const blob = new Blob(chunks, { type: 'audio/webm' });
-  
-    try {
-      const storageSnapshot = await storageRef.child(`recordings/${user.uid}/audio.webm`).put(blob);
-      const downloadURL = await storageSnapshot.ref.getDownloadURL();
-      setAudioURL(downloadURL);
-    } catch (error) {
-      console.error('Error saving recording to Firebase Storage:', error);
+    setRecordedBlob(blob);
+  };
+
+  const handleSave = async () => {
+    if (recordedBlob) {
+      try {
+        const storageSnapshot = await storageRef.child(`recordings/${user.uid}/${Date.now()}.webm`).put(recordedBlob);
+        const downloadURL = await storageSnapshot.ref.getDownloadURL();
+        console.log('Recording saved:', downloadURL);
+        setAudioURL(downloadURL);
+      } catch (error) {
+        console.error('Error saving recording to Firebase Storage:', error);
+      }
     }
   };
-  
-
   return (
     <div className="flex flex-col items-center">
       <h1 className="text-2xl font-bold mb-4">Voice Recorder</h1>
@@ -86,14 +90,31 @@ const Recorder = () => {
         >
           Stop Recording
         </button>
+        {recordedBlob && !audioURL && (
+          <div>
+            <audio className="mt-4" src={URL.createObjectURL(recordedBlob)} controls />
+          </div>
+        )}
+        {audioURL && (
+          <div>
+            <audio className="mt-4" src={audioURL} controls />
+          </div>
+        )}
+        {recordedBlob && !audioURL && (
+          <button
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-2"
+            onClick={handleSave}
+          >
+            Save Recording
+          </button>
+        )}
       </div>
-      {audioURL && (
-        <div>
-          <audio className="mt-4 " src={audioURL} controls />
-        </div>
-      )}
     </div>
   );
-};
+        }  
 
 export default Recorder;
+         
+
+       
+
