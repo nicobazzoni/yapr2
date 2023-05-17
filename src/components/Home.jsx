@@ -51,7 +51,7 @@ const Home = () => {
           
              <div>
             <Recorder />
-            <Feed />
+            {/* <Feed /> */}
            </div>
          
         </div>

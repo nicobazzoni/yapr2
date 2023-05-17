@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { storageRef, auth } from '../../firebase';
+import { storageRef, auth,firestore, } from '../../firebase';
 
 const Recorder = () => {
   const [recording, setRecording] = useState(false);
@@ -59,19 +59,31 @@ const Recorder = () => {
     const blob = new Blob(chunks, { type: 'audio/webm' });
     setRecordedBlob(blob);
   };
-
   const handleSave = async () => {
-    if (recordedBlob) {
+    if (recordedBlob && user) {
       try {
-        const storageSnapshot = await storageRef.child(`recordings/${user.uid}/${Date.now()}.webm`).put(recordedBlob);
-        const downloadURL = await storageSnapshot.ref.getDownloadURL();
+        const userStorageRef = storageRef.child(`users/${user.uid}/audio.webm`);
+        await userStorageRef.put(recordedBlob);
+        const downloadURL = await userStorageRef.getDownloadURL();
+  
+        // Perform any additional actions with the downloadURL here
+  
         console.log('Recording saved:', downloadURL);
+  
+        // Save the downloadURL to Firestore
+        const userDocRef = firestore.collection('users').doc(user.uid);
+        await userDocRef.update({ audioURL: downloadURL });
+  
         setAudioURL(downloadURL);
       } catch (error) {
-        console.error('Error saving recording to Firebase Storage:', error);
+        console.error('Error saving recording to Firestore:', error);
       }
     }
   };
+  
+  
+  
+  
   return (
     <div className="flex flex-col items-center">
       <h1 className="text-2xl font-bold mb-4">Voice Recorder</h1>
