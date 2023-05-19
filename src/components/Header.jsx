@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import yicon from '../assets/yicon.jpg';
 import { auth } from '../../firebase';
+import { AuthContext } from '../contexts/AuthContext';  // Update with your path
+
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,16 +19,23 @@ const Header = () => {
     });
   };
 
+ 
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
     });
 
+
     return () => unsubscribe();
   }, []);
 
+
+
+
+
   return (
-    <header className="flex justify-items-center relative">
+    <header className="flex items-center justify-between">
       <nav className={`navbar ${isMenuOpen ? 'open' : ''}`}>
         <div className="navbar-brand">
           <Link to="/" className="navbar-logo">
@@ -36,19 +45,19 @@ const Header = () => {
             <span className="navbar-toggle-icon"></span>
           </button>
         </div>
-        <ul className={`navbar-menu font-mono text-sm text-blue-200 ${isMenuOpen ? 'open' : ''}`}>
-          {user ? (
-            <li>
-              <button onClick={handleSignOut}>Sign Out</button>
-            </li>
-          ) : (
-            <li className="font-mono text-blue-200">
-              <Link to="/signin">Sign In</Link>
-            </li>
-          )}
-        </ul>
       </nav>
-   
+      <ul className={`flex items-center space-x-4 text-sm text-blue-200 ${isMenuOpen ? 'open' : ''}`}>
+        {user ? (
+          <li>
+            <h1 className="font-mono text-black">{user.username}</h1>
+            <button className='mb-8' onClick={handleSignOut}>Sign Out</button>
+          </li>
+        ) : (
+          <li className="font-mono text-blue-200">
+            <Link to="/signin">Sign In</Link>
+          </li>
+        )}
+      </ul>
     </header>
   );
 };

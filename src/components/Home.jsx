@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, firestore } from '../../firebase';
-import Recorder from './Recorder';
-import Feed from './Feed';
+import UploadForm from './Form';
+import Feed from './PostList';
+import yicon from '../assets/yicon.jpg';
 
 
 const Home = () => {
@@ -36,29 +37,42 @@ const Home = () => {
     }
   };
 
-  const handleSignOut = () => {
-    auth.signOut().then(() => {
-      navigate('/signin');
-    });
-  };
+
+
+  const goToSignUp = () => {
+    navigate('/signup');
+    };
+
+    const goToForm = () => {
+        navigate('/form');
+        };
+
+
 
   return (
     <div>
       {user ? (
-        <div>
-          <p className="font-mono font-bold">{user.username}</p>
-          {user.photoURL && <img className="h-20 w-20" src={user.photoURL} alt={user.username} />}
+        <div className='items-center'>
+            <div>
+                <button className='bg-whitesmoke border left-1  absolute rounded-full mt p-3' onClick={goToForm}>+</button>
+                </div>
+          <p className="font-mono font-bold ml-8">{user.username}</p>
+
           
              <div>
-            <Recorder />
-            {/* <Feed /> */}
+        
+            <Feed user={user} />
            </div>
+              
          
         </div>
         
       ) : (
-        <div>
-            <h1>hello</h1>
+        <div className='flex-col justify-items-center'>
+            
+            <h1 className='text-3xl font-bold font-mono text-center'>Welcome to Yapr</h1>
+            <button  className='bg-whitesmoke border rounded-full p-2' onClick={goToSignUp}>Sign Up</button>
+            <img className="h-50 w-50" src={yicon} alt='yicon' />
           </div>
       )}
     </div>
