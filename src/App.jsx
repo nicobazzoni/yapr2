@@ -10,6 +10,8 @@ import Header from './components/Header'
 import UploadForm from './components/Form'
 
 import { AuthProvider } from './contexts/AuthContext'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
 
@@ -18,13 +20,14 @@ function App() {
 
   return (
     <>
+     <ToastContainer />
     <AuthProvider>
       <Router>
         <header>
           <Header />
         </header>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home  />}/>
           <Route path="/signup" element={<SignUp />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/form" element={<UploadForm user={user} />} />
