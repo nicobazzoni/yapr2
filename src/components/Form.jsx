@@ -96,51 +96,57 @@ const UploadForm = () => {
 
 
   return (
-    <div className="flex flex-col items-center justify-center"  
-      style={{ 
+    <div className="flex flex-col justify-center items-center h-screen bg-blur" 
+     style={{
       backgroundImage: `url(${yicon})`,
       backgroundPosition: 'center',
-      backgroundSize: 'contain',
-      backgroundRepeat: 'repeat',
+      backgroundSize: 'cover',
+      }}>
      
-    }}>
-       <input 
-    id="fileInput"
-    className="hidden" 
-    type="file" 
-    onChange={handleChange} 
-  />
-  <label 
-    htmlFor="fileInput"
-    className="m-2 p-2 bg-blue-500 text-white cursor-pointer hover:bg-blue-700"
-  >
-    Choose File
-  </label>
-      <input 
-        className="m-2 p-2 border border-gray-400" 
-        type="text"
-        value={message}
-        onChange={e => setMessage(e.target.value)}
-        placeholder="Message"
-      />
-      <input 
-        className="m-2 p-2 border border-gray-400" 
-        type="text"
-        value={tag}
-        onChange={e => setTag(e.target.value)}
-        placeholder="Tag"
-      />
-      <button 
-        className="m-2 p-2 bg-blue-500 text-white hover:bg-blue-700" 
-        onClick={handleUpload}
-      >
-        Upload
-      </button>
-      {preview && <img src={preview} alt="preview" />}
-
-
+      
+  
+      <div className=" grid">
+        <input 
+          id="fileInput"
+          className="hidden " 
+          type="file" 
+          onChange={handleChange} 
+        />
+        <label 
+          htmlFor="fileInput"
+          className="m-2 p-2 bg-blue-500 text-white cursor-pointer hover:bg-blue-700"
+        >
+          Photo
+        </label>
+        <textarea 
+          className="m-2 p-2 border border-blue-400 outline-none rounded-md" 
+          value={message}
+          onChange={e => setMessage(e.target.value)}
+          placeholder="Message"
+          maxLength="200" // Limit to 200 characters
+        />
+        <input 
+          className="m-2 p-2 border  border-blue-400 rounded-full" 
+          type="text"
+          value={tag}
+          onChange={e => setTag(e.target.value)}
+          placeholder="Tag"
+          maxLength="10" // Limit to 10 characters
+        />
+        <button 
+          className="m-2 p-2 bg-blue-300 text-white hover:bg-blue-700 rounded-full" 
+          onClick={handleUpload}
+        >
+          Upload
+        </button>
+        {preview && <img src={preview} alt="preview" />}
+      </div>
     </div>
   );
+  
+  
+
+
 };
 
 export default UploadForm;

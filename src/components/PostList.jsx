@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { db } from '../../firebase';
 import { format } from 'date-fns';
 import { AuthContext } from '../contexts/AuthContext';  // Update with your path
+import {BsDot} from 'react-icons/bs';
 
 
 
@@ -37,7 +38,7 @@ const Feed = ({}) => {
           <img src={upload.imageUrl} alt={upload.tag} className="w-full object-cover rounded " />
           
           <div className='flex justify-between mt-auto'>
-            <p className="text-xs text-blue-300 ">{format(upload.timestamp.toDate(), 'MM/dd/yy/ h:mm')}</p>
+            <p className="text-xs text-blue-300  "style={{ fontSize: '8px' }}>{format(upload.timestamp.toDate(), 'MM·dd·yy - h:mm')}</p>
     
             <h2 className="text-xs font-mono">{upload.tag} </h2>
           </div>
