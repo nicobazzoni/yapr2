@@ -70,7 +70,7 @@ const navigate = useNavigate();
 
 
   return (
-    <header className="flex items-center mb-3 justify-between">
+    <header className="flex items-center mb-3 justify-between"  style={{ backgroundImage: `url(${yicon})` }}>
       <nav className={`navbar ${isMenuOpen ? 'open' : ''}`}>
         <div className="navbar-brand flex items-center">
           {user ? (

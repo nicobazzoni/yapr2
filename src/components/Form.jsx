@@ -4,6 +4,7 @@ import firebase from 'firebase/compat/app';
 import { AuthContext } from '../contexts/AuthContext';  // Update with your path
 import { auth , firestore} from '../../firebase';
 import { useNavigate } from 'react-router-dom';
+import yicon from '../assets/yicon.jpg';
 
 
 
@@ -95,7 +96,14 @@ const UploadForm = () => {
 
 
   return (
-    <div className="flex flex-col items-center justify-center bg-gray-200 ">
+    <div className="flex flex-col items-center justify-center"  
+      style={{ 
+      backgroundImage: `url(${yicon})`,
+      backgroundPosition: 'center',
+      backgroundSize: 'contain',
+      backgroundRepeat: 'repeat',
+     
+    }}>
        <input 
     id="fileInput"
     className="hidden" 
