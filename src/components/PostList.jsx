@@ -3,6 +3,7 @@ import { db, auth, firestore } from '../../firebase';
 import { format } from 'date-fns';
 import { AuthContext } from '../contexts/AuthContext';
 import { BsDot } from 'react-icons/bs';
+import { Link } from 'react-router-dom';
 
 const Feed = ({}) => {
   const [uploads, setUploads] = useState([]);
@@ -82,6 +83,8 @@ const Feed = ({}) => {
         {uploads.map(({ id, upload }) => (
           <div key={id} className="flex flex-col p-4 m-2 bg-white shadow-md rounded relative">
             <div className='flex justify-between'>
+            <Link to={`/details/${id}`}>reply</Link>
+
               <img src={upload.photoUrl} alt={upload.tag} className="h-5 w-5 border rounded-full" />
               <h1 className="text-xs font-bold font-mono text-blue-200">{upload.username}</h1>
             </div>

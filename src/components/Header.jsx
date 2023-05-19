@@ -67,21 +67,21 @@ const navigate = useNavigate();
    const backHome = () => {
     navigate('/');
   };
-
+   
 
   return (
     <header className="flex items-center mb-3 justify-between"  style={{ backgroundImage: `url(${yicon})` }}>
       <nav className={`navbar ${isMenuOpen ? 'open' : ''}`}>
-        <div className="navbar-brand flex items-center">
-          {user ? (
-            location.pathname === '/form' ? 
-            <RiHomeLine className="text-black" onClick={backHome} /> : 
-            <h1 className="font-mono text-black">{user.username}</h1>
-          ) : null}
-          <button className="navbar-toggle" onClick={toggleMenu}>
-            <span className="navbar-toggle-icon"></span>
-          </button>
-        </div>
+      <div className="navbar-brand flex items-center">
+  {user ? (
+    location.pathname === '/form' || location.pathname.startsWith('/details/') ? 
+    <RiHomeLine className="text-black" onClick={backHome} /> : 
+    <h1 className="font-mono text-black">{user.username}</h1>
+  ) : null}
+  <button className="navbar-toggle" onClick={toggleMenu}>
+    <span className="navbar-toggle-icon"></span>
+  </button>
+</div>
       </nav>
       <ul className={`flex items-center space-x-4 text-sm text-blue-200 ${isMenuOpen ? 'open' : ''}`}>
         {user ? (
