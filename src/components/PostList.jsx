@@ -25,7 +25,7 @@ const Feed = ({}) => {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       {uploads.map(({ id, upload }) => (
         <div key={id} className="p-4 m-2 bg-white shadow-md rounded">
           <div className='flex justify-between'>

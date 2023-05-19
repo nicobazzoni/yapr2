@@ -49,34 +49,38 @@ const Home = () => {
 
 
 
-  return (
-    <div>
-      {user ? (
-        <div className='items-center'>
-            <div>
-                <button className='bg-whitesmoke border left-1  absolute rounded-full mt p-3' onClick={goToForm}>+</button>
+        return (
+            <div className="m-4">
+              {user ? (
+                <div className="flex flex-col items-center">
+                  <div className="flex justify-between items-center w-full">
+                    <button 
+                      className='bg-whitesmoke border p-3 rounded-full' 
+                      onClick={goToForm}
+                    >
+                      <i class="fas fa-plus"></i> {/* FontAwesome icon for "+" */}
+                    </button>
+                    <p className="font-mono font-bold">{user.username}</p>
+                    {/* Some action or avatar can be added on the right */}
+                  </div>
+                  <div className="mt-4">
+                    <Feed user={user} />
+                  </div>
                 </div>
-          <p className="font-mono font-bold ml-8">{user.username}</p>
-
-          
-             <div>
-        
-            <Feed user={user} />
-           </div>
-              
-         
-        </div>
-        
-      ) : (
-        <div className='flex-col justify-items-center'>
-            
-            <h1 className='text-3xl font-bold font-mono text-center'>Welcome to Yapr</h1>
-            <button  className='bg-whitesmoke border rounded-full p-2' onClick={goToSignUp}>Sign Up</button>
-            <img className="h-50 w-50" src={yicon} alt='yicon' />
-          </div>
-      )}
-    </div>
-  );
-};
+              ) : (
+                <div className='flex flex-col items-center justify-center space-y-4'>
+                  <h1 className='text-3xl font-bold font-mono'>Welcome to Yapr</h1>
+                  <button 
+                    className='bg-whitesmoke border p-2 rounded-full' 
+                    onClick={goToSignUp}
+                  >
+                    Sign Up
+                  </button>
+                  <img className="h-50 w-50" src={yicon} alt='yicon' />
+                </div>
+              )}
+            </div>
+          );
+        };
 
 export default Home;
