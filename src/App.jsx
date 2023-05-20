@@ -15,6 +15,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import DetailsPage from './pages/DetailsPage'
 import ProfilePage from './pages/ProfilePage'
 import UsernamePage from './pages/UsernamePage'
+import VoiceCallRoom from './components/Chat'
+
 
 function App() {
 
@@ -37,6 +39,9 @@ function App() {
   <Route path="/username" element={<UsernamePage />} />
   <Route path="/details/:itemId" element={<DetailsPage />} />
   <Route path="/profile/:username" element={<ProfilePage />} />
+  <Route path="/voicecall" element={<VoiceCallRoom />} />
+
+
 
   <Route path="*" element={<h1>Not Found</h1>} />
 </Routes>

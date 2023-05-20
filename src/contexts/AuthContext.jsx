@@ -9,13 +9,20 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     auth.onAuthStateChanged(user => {
-      setCurrentUser(user);
+      if (user) {
+        // User is logged in
+        const { displayName, photoURL, uid } = user;
+        setCurrentUser({ uid, username: displayName, userPhoto: photoURL });
+      } else {
+        // User is logged out
+        setCurrentUser(null);
+      }
       setLoading(false);
     });
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;  // or replace with a loading spinner
+    return <div>Loading...</div>;
   }
 
   return (

@@ -82,8 +82,14 @@ const navigate = useNavigate();
       <div className="navbar-brand flex  items-center">
        
   {user ? (
-    location.pathname === '/form' || location.pathname.startsWith('/details/') || location.pathname.startsWith('/profile/') || location.pathname.startsWith('/username') ? 
-    <RiHomeLine className="text-black" onClick={backHome} /> : 
+    location.pathname === '/form' 
+    || location.pathname.startsWith('/details/') 
+    || location.pathname.startsWith('/profile/')
+    || location.pathname.startsWith('/username') 
+    || location.pathname.startsWith('/chat') 
+    
+    ? 
+    <RiHomeLine className="text-black ml-7" onClick={backHome} /> : 
     <h1 className="font-mono text-black">{user.username}</h1>
   ) : null}
 
