@@ -14,6 +14,7 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import DetailsPage from './pages/DetailsPage'
 import ProfilePage from './pages/ProfilePage'
+import UsernamePage from './pages/UsernamePage'
 
 function App() {
 
@@ -33,6 +34,7 @@ function App() {
   <Route path="/signup" element={<SignUp />} />
   <Route path="/signin" element={<SignIn />} />
   <Route path="/form" element={<UploadForm user={user} />} />
+  <Route path="/username" element={<UsernamePage />} />
   <Route path="/details/:itemId" element={<DetailsPage />} />
   <Route path="/profile/:username" element={<ProfilePage />} />
 

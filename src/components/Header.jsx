@@ -6,6 +6,7 @@ import { AuthContext } from '../contexts/AuthContext';  // Update with your path
 import {RiHomeLine} from 'react-icons/ri';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { MdPeopleOutline} from 'react-icons/md';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -67,27 +68,39 @@ const navigate = useNavigate();
    const backHome = () => {
     navigate('/');
   };
+
+  const goToUsername = () => {
+    navigate(`/username`);
+  };
    
 
   return (
     <header className="flex items-center mb-3 justify-between"  style={{ backgroundImage: `url(${yicon})` }}>
+        <MdPeopleOutline className="text-black" onClick={goToUsername} />
       <nav className={`navbar ${isMenuOpen ? 'open' : ''}`}>
-      <div className="navbar-brand flex items-center">
+        
+      <div className="navbar-brand flex  items-center">
+       
   {user ? (
-    location.pathname === '/form' || location.pathname.startsWith('/details/') || location.pathname.startsWith('/profile/') ? 
+    location.pathname === '/form' || location.pathname.startsWith('/details/') || location.pathname.startsWith('/profile/') || location.pathname.startsWith('/username') ? 
     <RiHomeLine className="text-black" onClick={backHome} /> : 
     <h1 className="font-mono text-black">{user.username}</h1>
   ) : null}
+
   <button className="navbar-toggle" onClick={toggleMenu}>
     <span className="navbar-toggle-icon"></span>
   </button>
+  
 </div>
       </nav>
-      <ul className={`flex items-center space-x-4 text-sm text-blue-500 ${isMenuOpen ? 'open' : ''}`}>
+      <ul className={`flex items-center  space-x-4 text-sm text-blue-500 ${isMenuOpen ? 'open' : ''}`}>
         {user ? (
           <li>
+            
             <button className='' onClick={handleSignOut}>Sign Out</button>
+       
           </li>
+
         ) : (
           <li className="font-mono text-blue-200">
             <Link to="/signin">Sign In</Link>
