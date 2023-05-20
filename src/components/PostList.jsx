@@ -5,6 +5,8 @@ import { AuthContext } from '../contexts/AuthContext';
 import { BsDot } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 import {RiReplyLine} from 'react-icons/ri';
+import LikeButton from './LikeButton';
+import { is } from 'date-fns/locale';
 
 
 
@@ -102,17 +104,24 @@ const Feed = ({}) => {
           const isCurrentUser = currentUser && uid === currentUser.uid; // Makes username hidden for the user who made the item
 
           return (
-            <div key={id} className="flex flex-col p-4 m-2 bg-white shadow-md rounded relative">
-              <div className="flex justify-between">
-                <Link className="fonto-mono text-sm text-blue-400" to={`/details/${id}`}>
+            <div key={id} className="flex flex-col p-4 m-2 bg-white  shadow-md rounded relative">
+              <div className="flex  justify-between">
+
+              {!isCurrentUser && upload.username !== currentUser.username && (
+                <Link className="font-mono text-sm text-blue-400" to={`/details/${id}`}>
                   <RiReplyLine className="text-blue-400 animate-pulse duration-300" />
                 </Link>
+
+              )}
                 {!isCurrentUser && upload.username !== currentUser.username && (
                   <Link to={`/profile/${upload.username}`}>
-                    <h1 className="text-xs font-bold font-mono p-1 bg-blue-950 text-stone-200">{upload.username}</h1>
+                    <h1 className="text-xs font-bold font-mono  bg-blue-950 text-stone-200">{upload.username}</h1>
                   </Link>
                 )}
               </div>
+              <h2 className="font-mono" style={{ fontSize: '9px' }}>
+                  {upload.tag}
+                </h2>
 
               <p className="mt-2 mb-4 font-mono tracking-wide">{upload.message}</p>
               <img src={upload.imageUrl} alt={upload.tag} className="w-full mb-2 object-cover rounded" />
@@ -122,11 +131,16 @@ const Feed = ({}) => {
                   <p className="text-xs text-blue-300 font-mono" style={{ fontSize: '7px' }}>
                     {format(upload.timestamp.toDate(), 'MM·dd·yy - h:mm')}
                   </p>
+                )} 
+                {!isCurrentUser && upload.username !== currentUser.username && (
+
+                <LikeButton   uploadId={id} user={user} />
+
                 )}
 
-                <h2 className="font-mono mr-16" style={{ fontSize: '9px' }}>
-                  {upload.tag}
-                </h2>
+                {isCurrentUser && (
+
+              
 
                 <button
                   className="font-mono text-blue-300 text-xs"
@@ -134,6 +148,7 @@ const Feed = ({}) => {
                 >
                   x
                 </button>
+                )}
               </div>
             </div>
           );

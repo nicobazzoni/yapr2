@@ -46,26 +46,26 @@ const ProfilePage = () => {
     }, [username]);
   
     return (
-      <div className="grid grid-cols-1 justify-items-center items-center mt-10">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-items-center items-center mt-10">
         {user ? (
           <div className="bg-white shadow-md rounded-md p-6">
             <img src={user.photoURL} alt={user.username} className="w-20 h-20 rounded-full mx-auto mb-4" />
             <p className="text-lg">
-              <span className="font-bold">Username:</span> {user.username}
+               {user.username}
             </p>
             <p className="text-lg">
               <span className="font-bold">Email:</span> {user.email}
             </p>
-            <h2 className="text-xl mt-4 font-bold">User Items:</h2>
+            <h2 className="text-xl mt-4 font-bold"><span className='text-blue-200'>{user.username}'s </span> yaps:</h2>
             <ul>
               {items.map((item) => (
-                <li key={item.id} className="bg-gray-100 rounded-md p-4 my-2">
-                  <div className="flex items-center">
-                    <img src={item.imageUrl} alt={item.username} className="w-10 h-10 rounded-full" />
-                    <p className="ml-2">{item.username}</p>
+                <li key={item.id} className="bg-slate-100 space-y-2 rounded-md p-4 my-2">
+                  <div className="flex items-center justify-center">
+                    <img src={item.imageUrl} alt={item.username} className="w-20 h-20 " />
+                  
                   </div>
-                  <p className="text-gray-600">{item.message}</p>
-                  <p className="text-gray-500 text-sm mt-1">Tag: {item.tag}</p>
+                  <p className="text-gray-600 bg-white ">{item.message}</p>
+                  <p className="text-gray-500 text-xs mt-1"> {item.tag}</p>
                 </li>
               ))}
             </ul>

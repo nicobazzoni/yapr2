@@ -75,7 +75,7 @@ const navigate = useNavigate();
    
 
   return (
-    <header className="flex items-center mb-3 justify-between"  style={{ backgroundImage: `url(${yicon})` }}>
+    <header className="flex justify-items-center  mb-3 justify-between"  style={{ backgroundImage: `url(${yicon})` }}>
         <MdPeopleOutline className="text-black" onClick={goToUsername} />
       <nav className={`navbar ${isMenuOpen ? 'open' : ''}`}>
         
@@ -89,7 +89,7 @@ const navigate = useNavigate();
     || location.pathname.startsWith('/chat') 
     
     ? 
-    <RiHomeLine className="text-black ml-7" onClick={backHome} /> : 
+    <RiHomeLine className="text-black " onClick={backHome} /> : 
     <h1 className="font-mono text-black">{user.username}</h1>
   ) : null}
 
