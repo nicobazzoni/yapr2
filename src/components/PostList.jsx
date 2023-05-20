@@ -124,9 +124,11 @@ const Feed = ({}) => {
                 </h2>
 
               <p className="mt-2 mb-4 font-mono tracking-wide">{upload.message}</p>
+              
               <img src={upload.imageUrl} alt={upload.tag} className="w-full mb-2 object-cover rounded" />
 
-              <div className="flex justify-between items-center absolute bottom-0 left-0 right-0 mr-1 ml-1">
+              <div className="flex justify-between items-center absolute bottom-0 p-1 left-0 right-0 mr-1 ml-1">
+                
                 {upload.timestamp && (
                   <p className="text-xs text-blue-300 font-mono" style={{ fontSize: '7px' }}>
                     {format(upload.timestamp.toDate(), 'MM·dd·yy - h:mm')}
@@ -134,7 +136,7 @@ const Feed = ({}) => {
                 )} 
                 {!isCurrentUser && upload.username !== currentUser.username && (
 
-                <LikeButton   uploadId={id} user={user} />
+                <LikeButton  initialLikes={upload.likes}  uploadId={id} user={user} />
 
                 )}
 
