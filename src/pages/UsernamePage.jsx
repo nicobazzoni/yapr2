@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { firestore } from '../../firebase';
 import { Link } from 'react-router-dom';
+import FollowButton from '../components/FollowButton';
 
 const UsernamePage = () => {
   const [users, setUsers] = useState([]);
@@ -47,6 +48,7 @@ const UsernamePage = () => {
             <h1 className=' ml-2 p-2 font-mono text-xs'style={{ fontSize: '8px' }}>
                  {user.email}
             </h1>
+            <FollowButton className='absolute right-1' userId={user.id} />
           </li>
         ))}
       </ul>

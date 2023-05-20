@@ -104,7 +104,7 @@ const Feed = ({}) => {
           const isCurrentUser = currentUser && uid === currentUser.uid; // Makes username hidden for the user who made the item
 
           return (
-            <div key={id} className="flex flex-col p-4 m-2 bg-white  shadow-md rounded relative">
+            <div key={id} className="flex flex-col p-4 m-2 bg-white border-t shadow-md rounded relative">
               <div className="flex  justify-between">
 
               {!isCurrentUser && upload.username !== currentUser.username && (
@@ -119,7 +119,7 @@ const Feed = ({}) => {
                   </Link>
                 )}
               </div>
-              <h2 className="font-mono" style={{ fontSize: '9px' }}>
+              <h2 className="font-mono bg-slate-100 mt-1 p-1" style={{ fontSize: '9px' }}>
                   {upload.tag}
                 </h2>
 

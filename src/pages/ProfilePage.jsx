@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { firestore } from '../../firebase';
+import LikeButton from '../components/LikeButton';
 
 
 
@@ -66,6 +67,8 @@ const ProfilePage = () => {
                   </div>
                   <p className="text-gray-600 bg-white ">{item.message}</p>
                   <p className="text-gray-500 text-xs mt-1"> {item.tag}</p>
+                  <p className='text-gray-500 text-xs mt-1'>{item.likes} likes</p>
+  
                 </li>
               ))}
             </ul>
