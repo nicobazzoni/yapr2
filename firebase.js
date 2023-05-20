@@ -5,7 +5,7 @@ import 'firebase/compat/storage';
 
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBIdF0uMvDVe4ZFDYDd8b7nvJBScOMCV30",
+    apiKey: import.meta.env.VITE_FIREBASE_KEY,
     authDomain: "batchat-307d9.firebaseapp.com",
     projectId: "batchat-307d9",
     storageBucket: "batchat-307d9.appspot.com",

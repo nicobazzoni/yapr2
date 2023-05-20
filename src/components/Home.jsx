@@ -4,12 +4,12 @@ import { auth, firestore } from '../../firebase';
 import UploadForm from './Form';
 import Feed from './PostList';
 import yicon from '../assets/yicon.jpg';
-
+import { useParams } from 'react-router-dom';
 
 const Home = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
-
+  const { uid } = useParams();
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
@@ -64,7 +64,7 @@ const Home = () => {
                         </div>
                       
                         <div>
-                            <Feed user={user} />
+                             <Feed uid={uid} />   
                         </div>
                     </div>
                 ) : (
