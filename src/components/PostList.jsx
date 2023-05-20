@@ -119,9 +119,12 @@ const Feed = ({}) => {
                   </Link>
                 )}
               </div>
-              <h2 className="font-mono bg-slate-100 mt-1 p-1" style={{ fontSize: '9px' }}>
-                  {upload.tag}
-                </h2>
+              <span className=" rounded p-1">
+  <h2  className="rounded-md  p-0.5 bg-slate-100 inline-block"  style={{ fontSize: '11px' }}>
+    {upload.tag}
+  </h2>
+</span>
+
 
               <p className="mt-2 mb-4 font-mono tracking-wide">{upload.message}</p>
               

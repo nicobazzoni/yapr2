@@ -27,11 +27,11 @@ const UsernamePage = () => {
   }, []);
 
   return (
-    <div className="bg-white shadow-md justify-between items-center rounded-md p-6">
-      
-      <ul className="space-y-4">
-        {users.map((user) => (
-          <li key={user.id} className="flex items-center">
+    <div className="bg-white shadow-md p-6">
+    <ul className="space-y-4">
+      {users.map((user) => (
+        <li key={user.id} className="flex items-center justify-between">
+          <div className="flex items-center">
             {user.photoURL && (
               <img
                 src={user.photoURL}
@@ -45,14 +45,19 @@ const UsernamePage = () => {
             >
               {user.username}
             </Link>
-            <h1 className=' ml-2 p-2 font-mono text-xs'style={{ fontSize: '8px' }}>
-                 {user.email}
+            <h1 className="ml-2 p-2 font-mono text-xs" style={{ fontSize: '8px' }}>
+              {user.email}
             </h1>
-            <FollowButton className='absolute right-1' userId={user.id} />
-          </li>
-        ))}
-      </ul>
-    </div>
+          </div>
+          <div className="flex items-center">
+            <FollowButton userId={user.id} />
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+  
+
   );
 };
 

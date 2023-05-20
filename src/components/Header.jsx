@@ -75,8 +75,8 @@ const navigate = useNavigate();
    
 
   return (
-    <header className="flex justify-items-center  mb-3 justify-between"  style={{ backgroundImage: `url(${yicon})` }}>
-        <MdPeopleOutline className="text-black" onClick={goToUsername} />
+    <header className="flex align-items-center  mb-3 justify-between"  style={{ backgroundImage: `url(${yicon})` }}>
+        <MdPeopleOutline className="text-black " onClick={goToUsername} />
       <nav className={`navbar ${isMenuOpen ? 'open' : ''}`}>
         
       <div className="navbar-brand flex  items-center">
@@ -90,7 +90,7 @@ const navigate = useNavigate();
     
     ? 
     <RiHomeLine className="text-black " onClick={backHome} /> : 
-    <h1 className="font-mono text-black">{user.username}</h1>
+    <h1 className="font-mono text-black text-xs font-bold bg-slate-100">{user.username}</h1>
   ) : null}
 
   <button className="navbar-toggle" onClick={toggleMenu}>
@@ -99,7 +99,7 @@ const navigate = useNavigate();
   
 </div>
       </nav>
-      <ul className={`flex items-center  space-x-4 text-sm text-blue-500 ${isMenuOpen ? 'open' : ''}`}>
+      <ul className={`flex items-center justify-items-center  space-x-4 text-sm text-blue-500 ${isMenuOpen ? 'open' : ''}`}>
         {user ? (
           <li>
             
