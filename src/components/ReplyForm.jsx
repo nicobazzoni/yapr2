@@ -93,12 +93,10 @@ const ReplyForm = ({ itemId,}) => {
 
   return (
     <div className="w-full max-w-sm mx-auto mt-4">
-      <h2 className="text-2xl font-bold mb-3">Leave a Reply</h2>
+      <h2 className="text-xs font-mono text-blue-200 font-bold mb-3">Leave a Reply</h2>
       <form onSubmit={handleReplySubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="replyContent">
-            Reply Content
-          </label>
+         
           <textarea 
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
             id="replyContent" 
@@ -114,7 +112,7 @@ const ReplyForm = ({ itemId,}) => {
         </div>
       </form>
       <div className="mt-4">
-      <h3 className="text-xl font-bold mb-2">Replies:</h3>
+      <h3 className=" text-blue-300 font-bold mb-2">Replies:</h3>
       {replies.map(reply => (
         
         <div key={reply.id} className="border-b py-2">
@@ -122,9 +120,12 @@ const ReplyForm = ({ itemId,}) => {
           <p>{reply.content}</p>
           <p className="text-sm text-gray-500"></p>
         </div>
+
        
       ))}
-    </div>
+     
+
+    </div> 
   </div>
       
     

@@ -13,6 +13,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import DetailsPage from './pages/DetailsPage'
+import ProfilePage from './pages/ProfilePage'
 
 function App() {
 
@@ -33,6 +34,8 @@ function App() {
   <Route path="/signin" element={<SignIn />} />
   <Route path="/form" element={<UploadForm user={user} />} />
   <Route path="/details/:itemId" element={<DetailsPage />} />
+  <Route path="/profile/:userId" element={<ProfilePage />} />
+
   <Route path="*" element={<h1>Not Found</h1>} />
 </Routes>
      

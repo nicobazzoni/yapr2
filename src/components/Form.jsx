@@ -147,8 +147,7 @@ const UploadForm = () => {
       </div>
      
       
-  
-      <div className=" grid">
+<div className=" grid">
         <input 
           id="fileInput"
           className="hidden " 

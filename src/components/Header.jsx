@@ -74,7 +74,7 @@ const navigate = useNavigate();
       <nav className={`navbar ${isMenuOpen ? 'open' : ''}`}>
       <div className="navbar-brand flex items-center">
   {user ? (
-    location.pathname === '/form' || location.pathname.startsWith('/details/') ? 
+    location.pathname === '/form' || location.pathname.startsWith('/details/') || location.pathname.startsWith('/profile/') ? 
     <RiHomeLine className="text-black" onClick={backHome} /> : 
     <h1 className="font-mono text-black">{user.username}</h1>
   ) : null}
@@ -83,7 +83,7 @@ const navigate = useNavigate();
   </button>
 </div>
       </nav>
-      <ul className={`flex items-center space-x-4 text-sm text-blue-200 ${isMenuOpen ? 'open' : ''}`}>
+      <ul className={`flex items-center space-x-4 text-sm text-blue-500 ${isMenuOpen ? 'open' : ''}`}>
         {user ? (
           <li>
             <button className='' onClick={handleSignOut}>Sign Out</button>

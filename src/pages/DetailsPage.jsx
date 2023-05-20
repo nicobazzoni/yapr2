@@ -41,19 +41,17 @@ const DetailsPage = () => {
   }
 
   return (
-    <div>
-      <h1>Upload Details</h1>
-      <img src={upload.imageUrl} alt={upload.tag} className="w-full object-cover rounded" />
-      <p>{upload.username}</p>
-      <p>{upload.message}</p>
-
-      <div>
-        <h2>Replies</h2>
+    <div className="py-8">
+      <h1 className="text-sm font-mono text-indigo-300 font-semibold">{upload.tag}</h1>
+      <img src={upload.imageUrl} alt={upload.tag} className="w-full h-auto object-cover rounded" />
+      <p className="mt-4 text-lg font-semibold">{upload.username}</p>
+      <p className="text-gray-600 font-mono">{upload.message}</p>
+  
+      <div className="mt-8">
+      
         <ReplyForm itemId={itemId} />
-        
+      </div>
     </div>
-    </div>
-
   );
 };
 
