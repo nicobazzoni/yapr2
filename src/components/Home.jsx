@@ -55,7 +55,7 @@ const Home = () => {
                     <div className='items-center'>
                         <div>
                             <button
-                                className='bg-whitesmoke border p-3 h-10 w-10 rounded-full bg-contain bg-center bg-no-repeat' 
+                                className='bg-whitesmoke border p-3 h-10 w-10 rounded-full bg-contain bg-center bg-no-repeat  hover:animate-pulse' 
                                 onClick={goToForm}
                                 style={{ backgroundImage: `url(${yicon})` }}
                             >

@@ -23,7 +23,7 @@ const navigate = useNavigate();
 
   const handleSignOut = () => {
     auth.signOut().then(() => {
-      // Additional actions upon sign out
+      navigate('/signin');
     });
   };
 
@@ -76,7 +76,7 @@ const navigate = useNavigate();
 
   return (
     <header className="flex align-items-center  mb-3 justify-between"  style={{ backgroundImage: `url(${yicon})` }}>
-        <MdPeopleOutline className="text-black " onClick={goToUsername} />
+        <MdPeopleOutline className="text-black cursor-pointer" onClick={goToUsername} />
       <nav className={`navbar ${isMenuOpen ? 'open' : ''}`}>
         
       <div className="navbar-brand flex  items-center">
@@ -89,8 +89,8 @@ const navigate = useNavigate();
     || location.pathname.startsWith('/chat') 
     
     ? 
-    <RiHomeLine className="text-black " onClick={backHome} /> : 
-    <h1 className="font-mono text-black text-xs font-bold bg-slate-100">{user.username}</h1>
+    <RiHomeLine className="text-black ml-11 " onClick={backHome} /> : 
+    <h1 className="font-mono text-black text-xs ml-8 font-bold bg-slate-100 ">{user.username}</h1>
   ) : null}
 
   <button className="navbar-toggle" onClick={toggleMenu}>

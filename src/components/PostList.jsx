@@ -115,20 +115,20 @@ const Feed = ({}) => {
               )}
                 {!isCurrentUser && upload.username !== currentUser.username && (
                   <Link to={`/profile/${upload.username}`}>
-                    <h1 className="text-xs font-bold font-mono  bg-blue-950 text-stone-200">{upload.username}</h1>
+                    <h1 className="text-xs font-bold font-mono p-0.5  bg-blue-950 text-stone-200">{upload.username}</h1>
                   </Link>
                 )}
               </div>
               <span className=" rounded p-1">
-  <h2  className="rounded-md  p-0.5 bg-slate-100 inline-block"  style={{ fontSize: '11px' }}>
-    {upload.tag}
-  </h2>
-</span>
+                <h2  className="rounded-md  font-mono p-0.5 bg-slate-100 inline-block"  style={{ fontSize: '11px' }}>
+                  {upload.tag}
+                </h2>
+              </span>
 
 
               <p className="mt-2 mb-4 font-mono tracking-wide">{upload.message}</p>
               
-              <img src={upload.imageUrl} alt={upload.tag} className="w-full mb-2 object-cover rounded" />
+              <img src={upload.imageUrl} alt={upload.tag} className="w-full mb-2 object-cover rounded max-w-full max-h-96" />
 
               <div className="flex justify-between items-center absolute bottom-0 p-1 left-0 right-0 mr-1 ml-1">
                 

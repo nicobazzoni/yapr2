@@ -1,11 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { auth, firestore, storageRef, db, timestamp, storage } from '../../firebase';
+import { AuthContext } from '../contexts/AuthContext';
 
 const Chat = () => {
   const [audioRecording, setAudioRecording] = useState(null);
   const audioRecorderRef = useRef(null);
   const audioPlayerRef = useRef(null);
-
+  const { currentUser } = useContext(AuthContext);
+  
   useEffect(() => {
     // Get access to the device microphone for audio recording
     navigator.mediaDevices.getUserMedia({ audio: true })
@@ -54,6 +56,31 @@ const Chat = () => {
     }
   };
 
+
+  const handleSave = async () => {
+    const username = currentUser.username;
+    console.log('Saving audio file...', username);
+
+    
+    try {
+        const audioFileRef = storageRef.child(`audio/${audioRecording.name}`);
+        await audioFileRef.put(audioRecording);
+        const audioFileUrl = await audioFileRef.getDownloadURL();
+        console.log('Audio file URL:', audioFileUrl);
+        const audioFileDoc = db.collection('audioFiles').doc();
+        await audioFileDoc.set({
+            url: audioFileUrl,
+            username: username,
+            createdAt: timestamp(),
+        });
+        console.log('Audio file document saved!');
+    } catch (error) {
+        console.error('Error saving audio file:', error);
+    }
+};
+
+
+
   return (
     <div className="flex flex-col items-center mt-8">
       <h2 className="text-2xl font-bold mb-4">Chat</h2>
@@ -75,6 +102,12 @@ const Chat = () => {
           onClick={handlePlayback}
         >
           Playback
+        </button>
+        <button
+          className="bg-yellow-300 hover:bg-rose-600 text-white py-2 px-4 rounded focus:outline-none"
+          onClick={handleSave}
+        >
+          Save
         </button>
       </div>
       {audioRecording && (

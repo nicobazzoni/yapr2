@@ -22,7 +22,7 @@ const navigation = useNavigate()
         username,
         photoURL, // Save photo URL in the user document
       });
-      navigation('signin'); // Navigate to home screen
+      navigation('/'); // Navigate to home screen
     } catch (error) {
       setError(error.message);
     }
