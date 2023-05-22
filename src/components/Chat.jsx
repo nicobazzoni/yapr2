@@ -151,8 +151,7 @@ const Chat = () => {
         <audio
           ref={audioPlayerRef}
           src={URL.createObjectURL(audioRecording)}
-          className="mt-4"
-         controls 
+          
         />
       )}
       <AudioFileList />
