@@ -119,27 +119,25 @@ const Chat = () => {
   
 
   return (
-    <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 mt-4">
-      <div className="overflow-x-hidden space-x-4 ">
-        <h2 className="text-2xl font-bold mb-4">Chat</h2>
-        {currentUser && user && user.username && user.photo && (
-          <h3 className="text-lg font-semibold mb-2">Logged in as: {user.username}</h3>
-        )}
-        <div className="flex items-center  space-x-4 justify-space-between  ">
-        <button
-    className={`bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none ${
-      isRecording ? 'animate-pulse' : ''
-    }`}
-    onClick={handleStartRecording}
-  >
-   talk
-  </button>
-  <button
-    className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none"
-    onClick={handleStopRecording}
-  >
-    stop
-  </button>
+    <div className="flex flex-col items-center mt-8">
+      <h2 className="text-2xl font-bold mb-4">Chat</h2>
+      {currentUser && user && user.username && user.photo && (
+        <h3 className="text-lg font-semibold mb-2">Logged in as: {user.username}</h3>
+      )}
+      <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+        <div className="flex space-x-4">
+          <button
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none"
+            onClick={handleStartRecording}
+          >
+            talk
+          </button>
+          <button
+            className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none"
+            onClick={handleStopRecording}
+          >
+            stop
+          </button>
           <button
             className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded focus:outline-none"
             onClick={handlePlayback}
@@ -147,24 +145,31 @@ const Chat = () => {
             listen
           </button>
           <button
-            className="bg-yellow-300  hover:bg-rose-600 text-black py-2 px-4 rounded focus:outline-none"
+            className="bg-yellow-300 hover:bg-rose-600 text-white py-2 px-4 rounded focus:outline-none"
             onClick={handleSave}
           >
-            save
+            Save
           </button>
         </div>
+        {audioRecording && (
+          <audio
+            ref={audioPlayerRef}
+            src={URL.createObjectURL(audioRecording)}
+            controls
+          />
+        )}
       </div>
-      {audioRecording && (
-        <audio
-          ref={audioPlayerRef}
-          src={URL.createObjectURL(audioRecording)}
-        />
-      )}
       <AudioFileList />
     </div>
   );
-  
-  
 };
 
 export default Chat;
+
+
+
+
+
+
+
+
