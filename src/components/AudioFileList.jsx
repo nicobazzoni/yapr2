@@ -28,17 +28,17 @@ const AudioFileList = () => {
 
   return (
     <div>
-      <h2 className="text-2xl text-blue-200 font-mono font-bold mb-4">Yaps:</h2>
+      <h2 className="text-2xl text-blue-200 p-1   font-mono font-bold mb-1">Yaps:</h2>
       {audioFiles.map((file) => (
-        <div key={file.id} className="mb-4 space-y-2">
-          <div className="flex justify-between items-center">
+        <div key={file.id} className="mb-4 space-y-4  space-x-3 p-1">
+          <div className="flex border-t-2  justify-between items-center">
             <div
-              className="bg-cover bg-center shadow-slate-400 shadow-lg w-10 h-10 rounded-full"
+              className="bg-cover bg-center mt-2 shadow-slate-400 shadow-lg w-10 h-10 rounded-full"
               style={{
                 backgroundImage: `url(${file.photo})`,
               }}
             ></div>
-            <p className="text-gray-600 bg-slate-50 font-mono shadow-md rounded-full max-w-fit p-2">
+            <p className="text-gray-600 text-xs bg-slate-50 font-mono shadow-md rounded-full max-w-fit p-2">
               {file.username}
             </p>
           </div>
