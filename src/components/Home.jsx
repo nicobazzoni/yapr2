@@ -9,6 +9,7 @@ import { useParams } from 'react-router-dom';
 const Home = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  
   const { uid } = useParams();
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
