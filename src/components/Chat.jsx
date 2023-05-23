@@ -153,13 +153,13 @@ const Chat = () => {
   };
 
   return (
-    <div className="flex flex-col items-center mt-8">
+    <div className="flex flex-col items-center  mt-8 md:cols-3">
       <h2 className="text-2xl font-bold mb-4">Chat</h2>
       {currentUser && user && user.username && user.photo && (
         <h3 className="text-lg font-semibold mb-2">Logged in as: {user.username}</h3>
       )}
       <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
-        <div className="flex space-x-4">
+        <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:space-x-2">
           <button
             className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none"
             onClick={handleStartRecording}
@@ -178,30 +178,30 @@ const Chat = () => {
           >
             Listen
           </button>
-          <div className="flex items-center">
-            <input
-              type="text"
-              value={tag}
-              onChange={(e) => setTag(e.target.value)}
-              placeholder="Enter a tag (max 10 characters)"
-              className="px-2 py-1 border rounded focus:outline-none"
-              maxLength={10}
-            />
-            <button
-              className="bg-yellow-300 hover:bg-rose-600 text-white py-2 px-4 rounded focus:outline-none"
-              onClick={() => handleSave(audioRecording, tag, user)}
-            >
-              Save
-            </button>
-          </div>
         </div>
-        {audioRecording && (
-          <audio ref={audioPlayerRef} src={URL.createObjectURL(audioRecording.blob)} />
-        )}
+        <div className="flex flex-col md:flex-row lg:flex-row md:space-x-3 lg:space-x-4 items-center">
+          <input
+            type="text"
+            value={tag}
+            onChange={(e) => setTag(e.target.value)}
+            placeholder="tag (max 10 characters)"
+            className="px-2 py-1 border rounded focus:outline-none"
+            maxLength={10}
+          />
+          <button
+            className="bg-yellow-300 mt-2 hover:bg-rose-600 text-white py-2 px-4 rounded focus:outline-none"
+            onClick={() => handleSave(audioRecording, tag, user)}
+          >
+            Save
+          </button>
+        </div>
       </div>
+      {audioRecording && (
+        <audio ref={audioPlayerRef} src={URL.createObjectURL(audioRecording.blob)} />
+      )}
       <div className="container mx-auto mt-8">
         <h2 className="text-2xl text-blue-200 p-1 font-mono font-bold mb-1">Yaps:</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
+        <div className="flex flex-col md:flex-row space-x-4 md:space-x-0">
           {audioFiles.map((file) => (
             <div key={file.id} className="mb-4 space-y-4 space-x-3 p-1">
               <div className="flex border-t-2 justify-between items-center">
@@ -235,7 +235,7 @@ const Chat = () => {
               )}
               {file.tag && (
                 <p className="text-gray-600 bg-whitesmoke font-mono text-xs p-1">
-                  Tag: {file.tag}
+                  {file.tag}
                 </p>
               )}
             </div>
