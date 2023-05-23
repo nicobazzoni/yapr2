@@ -201,10 +201,10 @@ const Chat = () => {
       )}
       <div className="container mx-auto mt-8">
         <h2 className="text-2xl text-blue-200 p-1 font-mono font-bold mb-1">Yaps:</h2>
-        <div className="flex flex-col md:flex-row space-x-4 md:space-x-0">
+        <div className="flex flex-col md:flex-row bg-whitesmoke space-x-4 md:space-x-0">
           {audioFiles.map((file) => (
-            <div key={file.id} className="mb-4 space-y-4 space-x-3 p-1">
-              <div className="flex border-t-2 justify-between items-center">
+            <div key={file.id} className="mb-4 space-y-4  space-x-3 p-1">
+              <div className="flex border-t-2 justify-between bg-slate-25 items-center">
                 <div
                   className="bg-cover bg-center mt-2 shadow-slate-400 shadow-lg w-10 h-10 rounded-full"
                   style={{
@@ -218,7 +218,7 @@ const Chat = () => {
               <ReactAudioPlayer
                 src={file.url}
                 key={file.id}
-                className="mb-2"
+                className="w-full bg-white p-4 rounded-md shadow-sm outline-none"
                 controls
                 style={{
                   width: '100%',
@@ -228,14 +228,15 @@ const Chat = () => {
                   boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
                 }}
               />
-              {file.createdAt && (
-                <p className="text-gray-600 bg-whitesmoke font-mono text-xs p-1">
-                  {format(file.createdAt.toDate(), 'MM·dd·yy - h:mm')}
+             
+              {file.tag && (
+                <p className="text-gray-600 border-t border-cyan-50 bg-white shadow-md hover:bg-indigo-50 font-mono text-xs p-1">
+                  {file.tag}
                 </p>
               )}
-              {file.tag && (
-                <p className="text-gray-600 bg-whitesmoke font-mono text-xs p-1">
-                  {file.tag}
+               {file.createdAt && (
+                <p  style={{fontSize: '10px'}}  className="text-gray-600  bg-whitesmoke font-mono text-xs p-1">
+                  {format(file.createdAt.toDate(), 'MM·dd·yy - h:mm a')}
                 </p>
               )}
             </div>
