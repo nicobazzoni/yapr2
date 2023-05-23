@@ -1,11 +1,47 @@
 // VoiceReply.jsx
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
+import { firestore, storageRef, timestamp, auth } from '../../firebase';
+import { AuthContext } from '../contexts/AuthContext';
+
 
 const VoiceReply = ({ file, username }) => {
   const [isReplyRecording, setIsReplyRecording] = useState(false);
   const [replyAudioRecording, setReplyAudioRecording] = useState(null);
   const [replyRecordingUrl, setReplyRecordingUrl] = useState('');
   const audioRecorderRef = useRef(null);
+  const [user, setUser] = useState(null);
+  const { currentUser } = useContext(AuthContext);
+
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        fetchUser(user.uid);
+        
+        console.log('user', user.uid);
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const fetchUser = async (userId) => {
+    try {
+      const userRef = firestore.collection('users').doc(userId);
+      const userSnapshot = await userRef.get();
+
+      if (userSnapshot.exists) {
+        const userData = userSnapshot.data();
+        console.log('User Data:', userData); // Log user data to the console
+        setUser({ id: userSnapshot.id, ...userData });
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+  
 
   const handleStartReplyRecording = () => {
     setIsReplyRecording(true);
@@ -37,28 +73,33 @@ const VoiceReply = ({ file, username }) => {
   };
 
   const handleSaveReply = async () => {
-    if (username && replyAudioRecording) {
+    if (currentUser && currentUser.username && replyAudioRecording) {
+      const { username, photoURL } = currentUser;
+      const replyToId = file.id; // Get the ID of the original audio file
+  
       try {
         const audioFileRef = storageRef.child(`audio/${replyAudioRecording.name}`);
         await audioFileRef.put(replyAudioRecording);
         const audioFileUrl = await audioFileRef.getDownloadURL();
-
-        // Save the reply audio file using the username
-        await db.collection('audioFiles').add({
+  
+        // Save the reply audio file using the username, user photo, and replyTo ID
+        await firestore.collection('audioFiles').add({
           url: audioFileUrl,
           username: username,
+          photo: photoURL,
           createdAt: timestamp(),
-          replyTo: file.id,
+          replyTo: replyToId, // Set the replyTo field with the original audio file ID
         });
-
+  
         console.log('Reply audio file saved successfully!');
       } catch (error) {
         console.error('Error saving reply audio file:', error);
       }
     } else {
-      console.log('Username or reply audio recording is missing.');
+      console.log('User information or reply audio recording is missing.');
     }
   };
+  
 
   return (
     <div>

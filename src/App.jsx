@@ -16,6 +16,7 @@ import DetailsPage from './pages/DetailsPage'
 import ProfilePage from './pages/ProfilePage'
 import UsernamePage from './pages/UsernamePage'
 import VoiceCallRoom from './components/Chat'
+import Room from './components/Room'
 
 
 function App() {
@@ -39,7 +40,7 @@ function App() {
   <Route path="/username" element={<UsernamePage />} />
   <Route path="/details/:itemId" element={<DetailsPage />} />
   <Route path="/profile/:username" element={<ProfilePage />} />
-  <Route path="/voicecall" element={<VoiceCallRoom />} />
+  <Route path="/voicecall" element={<Room />} />
 
 
 

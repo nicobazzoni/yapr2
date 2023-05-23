@@ -1,21 +1,27 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { auth, firestore, storageRef, db, timestamp } from '../../firebase';
 import { AuthContext } from '../contexts/AuthContext';
-import AudioFileList from './AudioFileList';
 import firebase from 'firebase/compat/app';
+import { format } from 'date-fns';
+import ReactAudioPlayer from 'react-audio-player';
+import { v4 as uuid } from 'uuid';
+
 const Chat = () => {
   const [audioRecording, setAudioRecording] = useState(null);
   const audioRecorderRef = useRef(null);
   const audioPlayerRef = useRef(null);
-  const { currentUser } = useContext(AuthContext);
+  const [tag, setTag] = useState(''); // State for the tag input field
+
   const [user, setUser] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [audioFiles, setAudioFiles] = useState([]);
+
+  const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         fetchUser(user.uid);
-        
         console.log('user', user.uid);
       } else {
         setUser(null);
@@ -32,7 +38,7 @@ const Chat = () => {
 
       if (userSnapshot.exists) {
         const userData = userSnapshot.data();
-        console.log('User Data:', userData); // Log user data to the console
+        console.log('User Data:', userData);
         setUser({ id: userSnapshot.id, ...userData });
       }
     } catch (error) {
@@ -41,8 +47,24 @@ const Chat = () => {
   };
 
   useEffect(() => {
-    // Get access to the device microphone for audio recording
-    navigator.mediaDevices.getUserMedia({ audio: true })
+    const unsubscribe = firestore
+      .collection('audioFiles')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot((snapshot) => {
+        const files = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setAudioFiles(files);
+      });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
       .then((stream) => {
         const audioRecorder = new MediaRecorder(stream);
         audioRecorderRef.current = audioRecorder;
@@ -51,7 +73,6 @@ const Chat = () => {
         console.error('Error accessing microphone:', error);
       });
 
-    // Clean up the audio recorder when the component unmounts
     return () => {
       if (audioRecorderRef.current) {
         audioRecorderRef.current.stop();
@@ -69,7 +90,8 @@ const Chat = () => {
       });
       audioRecorder.addEventListener('stop', () => {
         const blob = new Blob(chunks, { type: 'audio/wav' });
-        setAudioRecording(blob);
+        const recordingId = uuid(); // Generate a random ID for the recording
+        setAudioRecording({ id: recordingId, blob });
       });
       audioRecorder.start();
     }
@@ -90,33 +112,45 @@ const Chat = () => {
     }
   };
 
-  const handleSave = async () => {
-    if (user && user.username) {
+  const handleSave = async (audioRecording, tag, user) => {
+    if (user && user.username && user.photoURL) {
+      console.log('Saving audio file...');
+      const recordingId = audioRecording.id;
+      const filename = `${recordingId}.wav`; // Use the recording ID in the filename
       const username = user.username;
       const photo = user.photoURL;
-      console.log('Saving audio file...', username);
-  
+      const uid = currentUser.uid;
+
       try {
-        const audioFileRef = storageRef.child(`audio/${audioRecording.name}`);
-        await audioFileRef.put(audioRecording);
+        console.log('Uploading audio file...');
+        const audioFileRef = storageRef.child(`audio/${user.username}/${filename}`);
+        await audioFileRef.put(audioRecording.blob);
+        console.log('Audio file uploaded successfully.');
+
+        console.log('Getting audio file URL...');
         const audioFileUrl = await audioFileRef.getDownloadURL();
         console.log('Audio file URL:', audioFileUrl);
-        const audioFileDoc = db.collection('audioFiles').doc();
+
+        console.log('Saving audio file document...');
+        const audioFileDoc = db.collection('audioFiles').doc(); // Generate a new document ID
+        const docId = audioFileDoc.id; // Get the generated ID
         await audioFileDoc.set({
-          url: audioFileUrl,
-          username: username,
-          photo: photo,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          photoURL: photo,
+          username: username,
+          uid: uid,
+          tag: tag, // Save the tag with the audio file
+          url: audioFileUrl,
         });
         console.log('Audio file document saved!');
+
+        console.log('Resetting tag input field...');
+        setTag('');
       } catch (error) {
         console.error('Error saving audio file:', error);
       }
-    } else {
-      console.log('User not logged in or username not available.');
     }
   };
-  
 
   return (
     <div className="flex flex-col items-center mt-8">
@@ -130,46 +164,86 @@ const Chat = () => {
             className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none"
             onClick={handleStartRecording}
           >
-            talk
+            Talk
           </button>
           <button
             className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none"
             onClick={handleStopRecording}
           >
-            stop
+            Stop
           </button>
           <button
             className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded focus:outline-none"
             onClick={handlePlayback}
           >
-            listen
+            Listen
           </button>
-          <button
-            className="bg-yellow-300 hover:bg-rose-600 text-white py-2 px-4 rounded focus:outline-none"
-            onClick={handleSave}
-          >
-            Save
-          </button>
+          <div className="flex items-center">
+            <input
+              type="text"
+              value={tag}
+              onChange={(e) => setTag(e.target.value)}
+              placeholder="Enter a tag (max 10 characters)"
+              className="px-2 py-1 border rounded focus:outline-none"
+              maxLength={10}
+            />
+            <button
+              className="bg-yellow-300 hover:bg-rose-600 text-white py-2 px-4 rounded focus:outline-none"
+              onClick={() => handleSave(audioRecording, tag, user)}
+            >
+              Save
+            </button>
+          </div>
         </div>
         {audioRecording && (
-          <audio
-            ref={audioPlayerRef}
-            src={URL.createObjectURL(audioRecording)}
-            controls
-          />
+          <audio ref={audioPlayerRef} src={URL.createObjectURL(audioRecording.blob)} />
         )}
       </div>
-      <AudioFileList />
+      <div className="container mx-auto mt-8">
+        <h2 className="text-2xl text-blue-200 p-1 font-mono font-bold mb-1">Yaps:</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
+          {audioFiles.map((file) => (
+            <div key={file.id} className="mb-4 space-y-4 space-x-3 p-1">
+              <div className="flex border-t-2 justify-between items-center">
+                <div
+                  className="bg-cover bg-center mt-2 shadow-slate-400 shadow-lg w-10 h-10 rounded-full"
+                  style={{
+                    backgroundImage: `url(${file.photoURL})`,
+                  }}
+                ></div>
+                <p className="text-gray-600 text-xs bg-slate-50 font-mono shadow-md rounded-full max-w-fit p-2">
+                  {file.username}
+                </p>
+              </div>
+              <ReactAudioPlayer
+                src={file.url}
+                key={file.id}
+                className="mb-2"
+                controls
+                style={{
+                  width: '100%',
+                  borderRadius: '8px',
+                  padding: '8px',
+                  backgroundColor: '#ffffff',
+                  boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
+                }}
+              />
+              {file.createdAt && (
+                <p className="text-gray-600 bg-whitesmoke font-mono text-xs p-1">
+                  {format(file.createdAt.toDate(), 'MM·dd·yy - h:mm')}
+                </p>
+              )}
+              {file.tag && (
+                <p className="text-gray-600 bg-whitesmoke font-mono text-xs p-1">
+                  Tag: {file.tag}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
 
 export default Chat;
-
-
-
-
-
-
-
-
