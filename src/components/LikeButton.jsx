@@ -6,7 +6,7 @@ import { FaHeart } from 'react-icons/fa';
 import { AuthContext } from '../contexts/AuthContext';
 
 const LikeButton = ({ uploadId, initialLikes }) => {
-  const [likes, setLikes] = useState(initialLikes);
+  const [likes, setLikes] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const { currentUser } = useContext(AuthContext);
 

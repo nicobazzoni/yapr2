@@ -324,13 +324,13 @@ const Chat = () => {
               file.replies.map((reply) => (
                 <div
                   key={reply.id}
-                  className="mt-4 flex  items-center space-between bg-whitemsoke p-4 rounded-md shadow-md cursor-pointer"
+                  className="mt-4 flex max-w-fit items-center space-between bg-whitemsoke p-4 rounded-md shadow-md cursor-pointer"
                   onClick={() => handlePlayAudio(reply.url)}
                 >
-     <div className="flex bg-white items-center space-x-4">
+     <div className="flex bg-white items-center max-w-fit space-x-4">
   <div  className="bg-cover  bg-center mt-2 shadow-slate-400 shadow-lg w-10 h-10 rounded-full" style={{ backgroundImage: `url(${reply.photo})` }}></div>
   <div className="flex flex-col">
-    <div className="flex  justify-between space-x-1">
+    <div className="flex  justify-between border-t space-x-1">
       <p className="font-bold">{reply.tag}</p>
       <p className="text-gray-600 text-sm font-medium">{reply.username}</p>
     </div>
