@@ -5,16 +5,19 @@ import firebase from 'firebase/compat/app';
 import { format } from 'date-fns';
 import ReactAudioPlayer from 'react-audio-player';
 import { v4 as uuid } from 'uuid';
+import ReplyComponent from './ReplyComponent';
 
 const Chat = () => {
   const [audioRecording, setAudioRecording] = useState(null);
   const audioRecorderRef = useRef(null);
   const audioPlayerRef = useRef(null);
-  const [tag, setTag] = useState(''); // State for the tag input field
-
+  const [tag, setTag] = useState('');
   const [user, setUser] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const [audioFiles, setAudioFiles] = useState([]);
+  const [showReply, setShowReply] = useState(false);
+  const [replyRecordingId, setReplyRecordingId] = useState('');
+  const [replies, setReplies] = useState([]);
 
   const { currentUser } = useContext(AuthContext);
 
@@ -22,7 +25,6 @@ const Chat = () => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         fetchUser(user.uid);
-        console.log('user', user.uid);
       } else {
         setUser(null);
       }
@@ -38,7 +40,6 @@ const Chat = () => {
 
       if (userSnapshot.exists) {
         const userData = userSnapshot.data();
-        console.log('User Data:', userData);
         setUser({ id: userSnapshot.id, ...userData });
       }
     } catch (error) {
@@ -90,7 +91,7 @@ const Chat = () => {
       });
       audioRecorder.addEventListener('stop', () => {
         const blob = new Blob(chunks, { type: 'audio/wav' });
-        const recordingId = uuid(); // Generate a random ID for the recording
+        const recordingId = uuid();
         setAudioRecording({ id: recordingId, blob });
       });
       audioRecorder.start();
@@ -112,48 +113,96 @@ const Chat = () => {
     }
   };
 
-  const handleSave = async (audioRecording, tag, user) => {
-    if (user && user.username && user.photoURL) {
-      console.log('Saving audio file...');
-      const recordingId = audioRecording.id;
-      const filename = `${recordingId}.wav`; // Use the recording ID in the filename
-      const username = user.username;
-      const photo = user.photoURL;
+  const handleReplyButtonClick = (recordingId) => {
+    setShowReply(true);
+    setReplyRecordingId(recordingId);
+  };
+
+  const handleSave = async () => {
+    if (currentUser && currentUser.username && currentUser.photoURL) {
+      const filename = `${replyRecordingId}.wav`;
+      const username = currentUser.username;
+      const photo = currentUser.photoURL;
       const uid = currentUser.uid;
 
       try {
-        console.log('Uploading audio file...');
-        const audioFileRef = storageRef.child(`audio/${user.username}/${filename}`);
+        const audioFileRef = storageRef.child(`audio/${username}/${filename}`);
         await audioFileRef.put(audioRecording.blob);
-        console.log('Audio file uploaded successfully.');
 
-        console.log('Getting audio file URL...');
         const audioFileUrl = await audioFileRef.getDownloadURL();
-        console.log('Audio file URL:', audioFileUrl);
 
-        console.log('Saving audio file document...');
-        const audioFileDoc = db.collection('audioFiles').doc(); // Generate a new document ID
-        const docId = audioFileDoc.id; // Get the generated ID
+        const audioFileDoc = db.collection('audioFiles').doc();
+        const docId = audioFileDoc.id;
         await audioFileDoc.set({
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          createdAt: timestamp,
           photoURL: photo,
           username: username,
           uid: uid,
-          tag: tag, // Save the tag with the audio file
+          tag: tag,
           url: audioFileUrl,
+          replyTo: replyRecordingId,
         });
-        console.log('Audio file document saved!');
 
-        console.log('Resetting tag input field...');
         setTag('');
+        handleReplyButtonClick(''); // Call the handleReplyButtonClick function with an empty string
       } catch (error) {
         console.error('Error saving audio file:', error);
       }
     }
   };
 
+  const fetchReplies = async (audioFileId) => {
+    try {
+      const repliesSnapshot = await firestore
+        .collection('audioReplies')
+        .where('parentPostId', '==', audioFileId)
+        .orderBy('createdAt', 'asc')
+        .get();
+
+      const repliesData = repliesSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      return repliesData;
+    } catch (error) {
+      console.error('Error fetching replies:', error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    const fetchAudioFilesAndReplies = async () => {
+      try {
+        const audioFilesSnapshot = await firestore
+          .collection('audioFiles')
+          .orderBy('createdAt', 'desc')
+          .get();
+
+        const audioFilesData = audioFilesSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        const audioFilesWithReplies = await Promise.all(
+          audioFilesData.map(async (audioFile) => {
+            const repliesData = await fetchReplies(audioFile.id);
+            return { ...audioFile, replies: repliesData };
+          })
+        );
+
+        setAudioFiles(audioFilesWithReplies);
+        console.log('audioFilesWithReplies', audioFilesWithReplies);
+      } catch (error) {
+        console.error('Error fetching audio files and replies:', error);
+      }
+    };
+
+    fetchAudioFilesAndReplies();
+  }, []);
+
   return (
-    <div className="flex flex-col items-center  mt-8 md:cols-3">
+    <div className="flex flex-col items-center mt-8 md:cols-3">
       <h2 className="text-2xl font-bold mb-4">Chat</h2>
       {currentUser && user && user.username && user.photo && (
         <h3 className="text-lg font-semibold mb-2">Logged in as: {user.username}</h3>
@@ -201,10 +250,10 @@ const Chat = () => {
       )}
       <div className="container mx-auto mt-8">
         <h2 className="text-2xl text-blue-200 p-1 font-mono font-bold mb-1">Yaps:</h2>
-        <div className="flex flex-col md:flex-row bg-whitesmoke space-x-4 md:space-x-0">
+        <div className="flex flex-col md:flex-row space-x-4 md:space-x-0">
           {audioFiles.map((file) => (
-            <div key={file.id} className="mb-4 space-y-4  space-x-3 p-1">
-              <div className="flex border-t-2 justify-between bg-slate-25 items-center">
+            <div key={file.id} className="mb-4 space-y-4 space-x-3 p-1">
+              <div className="flex border-t-2 justify-between items-center">
                 <div
                   className="bg-cover bg-center mt-2 shadow-slate-400 shadow-lg w-10 h-10 rounded-full"
                   style={{
@@ -228,17 +277,54 @@ const Chat = () => {
                   boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
                 }}
               />
-             
               {file.tag && (
                 <p className="text-gray-600 border-t border-cyan-50 bg-white shadow-md hover:bg-indigo-50 font-mono text-xs p-1">
                   {file.tag}
                 </p>
               )}
-               {file.createdAt && (
-                <p  style={{fontSize: '10px'}}  className="text-gray-600  bg-whitesmoke font-mono text-xs p-1">
+              {file.createdAt && (
+                <p style={{ fontSize: '10px' }} className="text-gray-600 bg-whitesmoke font-mono text-xs p-1">
                   {format(file.createdAt.toDate(), 'MM·dd·yy - h:mm a')}
                 </p>
               )}
+              <button
+                className="bg-yellow-300 hover:bg-yellow-400 text-white py-1 px-2 rounded focus:outline-none mt-2"
+                onClick={() => handleReplyButtonClick(file.id)}
+              >
+                Reply
+              </button>
+              {showReply && file.id === replyRecordingId && (
+                <ReplyComponent
+                  recordingId={replyRecordingId}
+                  handleReplyButtonClick={handleReplyButtonClick}
+                />
+              )}
+              {file.replies &&
+                file.replies.map((reply) => (
+                  <div
+                    key={reply.id}
+                    className="mt-4 bg-white p-4 rounded-md shadow-md"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div
+                        className="w-10 h-10 rounded-full bg-gray-200"
+                        style={{ backgroundImage: `url(${reply.photo})` }}
+                      ></div>
+                      <p className="text-gray-600 text-sm font-medium">
+                        {reply.username}
+                      </p>
+                    </div>
+                    <ReactAudioPlayer
+                      src={reply.url}
+                      className="mt-2"
+                      controls
+                    />
+                    <p className="text-gray-500 text-sm mt-2">{reply.tag}</p>
+                    <p className="text-gray-500 text-xs mt-1">
+                      {format(reply.createdAt.toDate(), 'MM·dd·yy - h:mm a')}
+                    </p>
+                  </div>
+                ))}
             </div>
           ))}
         </div>
