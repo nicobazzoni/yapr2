@@ -91,12 +91,13 @@ const Chat = () => {
       });
       audioRecorder.addEventListener('stop', () => {
         const blob = new Blob(chunks, { type: 'audio/wav' });
-        const recordingId = uuid();
+        const recordingId = uuid(); // Generate unique ID using uuid()
         setAudioRecording({ id: recordingId, blob });
       });
       audioRecorder.start();
     }
   };
+  
 
   const handleStopRecording = () => {
     setIsRecording(false);
@@ -118,23 +119,23 @@ const Chat = () => {
     setReplyRecordingId(recordingId);
   };
 
-  const handleSave = async () => {
-    if (currentUser && currentUser.username && currentUser.photoURL) {
+  const handleSave = async (recording, tag, user) => {
+    if (user && user.username && user.photoURL && recording && tag) {
       const filename = `${replyRecordingId}.wav`;
-      const username = currentUser.username;
-      const photo = currentUser.photoURL;
+      const username = user.username;
+      const photo = user.photoURL;
       const uid = currentUser.uid;
-
+  
       try {
         const audioFileRef = storageRef.child(`audio/${username}/${filename}`);
-        await audioFileRef.put(audioRecording.blob);
-
+        await audioFileRef.put(recording.blob);
+  
         const audioFileUrl = await audioFileRef.getDownloadURL();
-
+  
         const audioFileDoc = db.collection('audioFiles').doc();
         const docId = audioFileDoc.id;
         await audioFileDoc.set({
-          createdAt: timestamp,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           photoURL: photo,
           username: username,
           uid: uid,
@@ -142,14 +143,19 @@ const Chat = () => {
           url: audioFileUrl,
           replyTo: replyRecordingId,
         });
-
+  
         setTag('');
         handleReplyButtonClick(''); // Call the handleReplyButtonClick function with an empty string
       } catch (error) {
         console.error('Error saving audio file:', error);
       }
+    } else {
+      console.log('Missing user, audio recording, or tag');
     }
   };
+  
+  
+  
 
   const fetchReplies = async (audioFileId) => {
     try {
@@ -237,12 +243,12 @@ const Chat = () => {
             className="px-2 py-1 border rounded focus:outline-none"
             maxLength={10}
           />
-          <button
-            className="bg-yellow-300 mt-2 hover:bg-rose-600 text-white py-2 px-4 rounded focus:outline-none"
-            onClick={() => handleSave(audioRecording, tag, user)}
-          >
-            Save
-          </button>
+       <button
+        className="bg-yellow-300 mt-2 hover:bg-rose-600 text-white py-2 px-4 rounded focus:outline-none"
+        onClick={() => handleSave(audioRecording, tag, user)}
+      >
+        Save
+      </button>
         </div>
       </div>
       {audioRecording && (

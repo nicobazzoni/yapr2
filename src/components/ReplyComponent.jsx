@@ -85,16 +85,12 @@ const ReplyComponent = ({ recordingId,  }) => {
   };
 
   const handleSave = async () => {
-    console.log('user:', user);
-  
     if (user && user.username && audioRecording && tag) {
       const filename = `${replyId}.wav`;
       const username = user.username;
       const photo = user.photoURL || '';
       const uid = currentUser.uid;
   
-      console.log('username:', username);
-      console.log('photo:', photo);
       try {
         const audioFileRef = storageRef.child(`audio/${username}/${filename}`);
         await audioFileRef.put(audioRecording.blob);
@@ -116,20 +112,20 @@ const ReplyComponent = ({ recordingId,  }) => {
         console.log('Audio reply saved:', replyId);
         setTag('');
   
-        // Show a success toast message
-        toast.success('Reply submitted successfully!');
-  
-        // Call the handleReplySubmit function in the parent component to refresh the replies
-        handleReplySubmit();
+        // Show toast message here
+        toast.success('Reply saved successfully!');
+        // Refresh data
+        // Call the function to refresh the data, you can replace it with the actual function that fetches the data
+        fetchData();
       } catch (error) {
         console.error('Error saving audio file:', error);
-        // Show an error toast message
-        toast.error('Error saving reply. Please try again.');
+        toast.error('Error saving audio file');
       }
     } else {
       console.log('Missing user, audio recording, or tag');
     }
   };
+  
 
   return (
     <div className="flex flex-col items-center mt-8">
