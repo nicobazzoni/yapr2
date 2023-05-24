@@ -267,9 +267,9 @@ const Chat = () => {
         <div className="flex flex-col md:flex-row space-x-4 md:space-x-0">
         {audioFiles.map((file) => (
     <div key={file.id} className="mb-4 space-y-4 space-x-3 p-1">
-      <div className="flex border-t-2 justify-between items-center">
+      <div className="flex border-t-2 justify-between items-center bg-slate-100">
         <div
-          className="bg-cover bg-center mt-2 shadow-slate-400 shadow-lg w-10 h-10 rounded-full"
+          className="bg-cover bg-center mt-2 shadow-slate-400 shadow-lg w-20 h-10 rounded-sm"
           style={{
             backgroundImage: `url(${file.photoURL})`,
           }}
@@ -299,6 +299,7 @@ const Chat = () => {
           {format(file.createdAt.toDate(), 'MM·dd·yy - h:mm a')}
         </p>
       )}
+      <div className='border border-spacing-14' />
               <button
                 className="bg-blue-200 hover:bg-blue-400 text-white py-1 px-2 rounded focus:outline-none mt-2"
                 onClick={() => handleReplyButtonClick(file.id)}
@@ -313,20 +314,20 @@ const Chat = () => {
                   
                 />
               )}
-              <div className='border border-indigo-50' />
+              <div className='border border-indigo-50 ' />
 
               <h1 className='font-mono  '>replies</h1>
-
+              <div className=''>
               
               {file.replies &&
               file.replies.map((reply) => (
                 <div
                   key={reply.id}
-                  className="mt-4 flex items-center space-between bg-white p-4 rounded-md shadow-md cursor-pointer"
+                  className="mt-4 flex  items-center space-between bg-whitemsoke p-4 rounded-md shadow-md cursor-pointer"
                   onClick={() => handlePlayAudio(reply.url)}
                 >
-     <div className="flex items-center space-x-4">
-  <div className="w-10 h-10 rounded-full bg-gray-200" style={{ backgroundImage: `url(${reply.photo})` }}></div>
+     <div className="flex bg-white items-center space-x-4">
+  <div  className="bg-cover  bg-center mt-2 shadow-slate-400 shadow-lg w-10 h-10 rounded-full" style={{ backgroundImage: `url(${reply.photo})` }}></div>
   <div className="flex flex-col">
     <div className="flex  justify-between space-x-1">
       <p className="font-bold">{reply.tag}</p>
@@ -334,12 +335,14 @@ const Chat = () => {
     </div>
     <p className="text-gray-600 text-xs font-mono mt-1">{format(reply.createdAt.toDate(), 'MM·dd·yy - h:mm a')}</p>
   </div>
+
+
 </div>
-                 
+              
                 </div>
               ))}
 
-            </div>
+            </div> </div>  
           ))}
         </div>
       </div>
