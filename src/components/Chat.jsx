@@ -215,7 +215,7 @@ const Chat = () => {
 
 
   return (
-    <div className="flex flex-col items-center mt-8 md:cols-3">
+<div className="flex flex-col items-center mt-8 lg:flex-row lg:flex-wrap lg:justify-center">
       <h2 className="text-2xl font-bold mb-4">Chat</h2>
       {currentUser && user && user.username && user.photo && (
         <h3 className="text-lg font-semibold mb-2">Logged in as: {user.username}</h3>
@@ -262,9 +262,10 @@ const Chat = () => {
       {audioRecording && (
         <audio ref={audioPlayerRef} src={URL.createObjectURL(audioRecording.blob)} />
       )}
-      <div className="container mx-auto mt-8">
+      <div className="container mx-auto lg:w-1/2 mt-8">
         <h2 className="text-2xl text-blue-200 p-1 font-mono font-bold mb-1">Yaps:</h2>
-        <div className="flex flex-col md:flex-row space-x-4 md:space-x-0">
+        
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 ">
         {audioFiles.map((file) => (
     <div key={file.id} className="mb-4 space-y-4 space-x-3 p-1">
       <div className="flex border-t-2 justify-between items-center bg-slate-100">
@@ -289,7 +290,7 @@ const Chat = () => {
         }}
         onClick={() => handlePlayAudio(file.url)}
       >
-        <div className="flex items-center justify-between">
+        <div className="flex items-center  justify-between">
           <div>{file.username}</div>
           <div>{file.tag}</div>
         </div>
@@ -299,7 +300,7 @@ const Chat = () => {
           {format(file.createdAt.toDate(), 'MM·dd·yy - h:mm a')}
         </p>
       )}
-      <div className='border border-spacing-14' />
+      <div className='border lg:w-1/2 border-spacing-14' />
               <button
                 className="bg-blue-200 hover:bg-blue-400 text-white py-1 px-2 rounded focus:outline-none mt-2"
                 onClick={() => handleReplyButtonClick(file.id)}

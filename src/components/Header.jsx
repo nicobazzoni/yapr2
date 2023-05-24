@@ -7,7 +7,7 @@ import {RiHomeLine} from 'react-icons/ri';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { MdPeopleOutline} from 'react-icons/md';
-
+import { HiOutlineMicrophone } from 'react-icons/hi';
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
@@ -72,26 +72,33 @@ const navigate = useNavigate();
   const goToUsername = () => {
     navigate(`/username`);
   };
+
+  const goToVoicecall = () => { 
+    navigate(`/voicecall`);
+  };
    
 
   return (
-    <header className="flex align-items-center  mb-3 justify-between"  style={{ backgroundImage: `url(${yicon})` }}>
-        <MdPeopleOutline className="text-black cursor-pointer" onClick={goToUsername} />
+    <header className="flex align-items-center p-1 border-b   mb-3 justify-between"  style={{ backgroundImage: `url(${yicon})` }}>
+        <MdPeopleOutline className="text-black  cursor-pointer rounded-full hover:bg-blue-200" onClick={goToUsername} />
+        <HiOutlineMicrophone className="text-black  rounded-full hover:bg-blue-200 hover:animate-pulse cursor-pointer" onClick={goToVoicecall} />
       <nav className={`navbar ${isMenuOpen ? 'open' : ''}`}>
         
       <div className="navbar-brand flex  items-center">
        
-  {user ? (
-    location.pathname === '/form' 
-    || location.pathname.startsWith('/details/') 
-    || location.pathname.startsWith('/profile/')
-    || location.pathname.startsWith('/username') 
-    || location.pathname.startsWith('/chat') 
-    
-    ? 
-    <RiHomeLine className="text-black ml-11 " onClick={backHome} /> : 
-    <h1 className="font-mono text-black text-xs ml-8 font-bold bg-slate-100 ">{user.username}</h1>
-  ) : null}
+      {user ? (
+  location.pathname === '/form' ||
+  location.pathname.startsWith('/details/') ||
+  location.pathname.startsWith('/profile/') ||
+  location.pathname.startsWith('/username') ||
+  location.pathname.startsWith('/chat') ? (
+    <RiHomeLine className="text-black ml-11" onClick={backHome} />
+  ) : (
+    <a href={`/profile/${user.username}`} className="font-mono rounded-full hover:bg-blue-200 hover:text-red-500 text-black text-xs ml-8 font-bold bg-slate-100">
+      {user.username}
+    </a>
+  )
+) : null}
 
   <button className="navbar-toggle" onClick={toggleMenu}>
     <span className="navbar-toggle-icon"></span>
