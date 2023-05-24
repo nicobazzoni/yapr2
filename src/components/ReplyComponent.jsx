@@ -115,8 +115,9 @@ const ReplyComponent = ({ recordingId,  }) => {
         // Show toast message here
         toast.success('Reply saved successfully!');
         // Refresh data
-        // Call the function to refresh the data, you can replace it with the actual function that fetches the data
-        fetchData();
+        fetchReplies(); 
+        
+        // Replace fetchData with your actual function to fetch the data
       } catch (error) {
         console.error('Error saving audio file:', error);
         toast.error('Error saving audio file');
@@ -125,6 +126,26 @@ const ReplyComponent = ({ recordingId,  }) => {
       console.log('Missing user, audio recording, or tag');
     }
   };
+  const fetchReplies = async (audioFileId) => {
+    try {
+      const repliesSnapshot = await firestore
+        .collection('audioReplies')
+        .where('parentPostId', '==', audioFileId)
+        .orderBy('createdAt', 'asc')
+        .get();
+
+      const repliesData = repliesSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      return repliesData;
+    } catch (error) {
+      console.error('Error fetching replies:', error);
+      return [];
+    }
+  };
+  
   
 
   return (

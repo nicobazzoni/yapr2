@@ -207,6 +207,13 @@ const Chat = () => {
     fetchAudioFilesAndReplies();
   }, []);
 
+  const handlePlayAudio = (url) => {
+    const audioPlayer = new Audio(url);
+    audioPlayer.play();
+  };
+
+
+
   return (
     <div className="flex flex-col items-center mt-8 md:cols-3">
       <h2 className="text-2xl font-bold mb-4">Chat</h2>
@@ -251,50 +258,49 @@ const Chat = () => {
       </button>
         </div>
       </div>
+
       {audioRecording && (
         <audio ref={audioPlayerRef} src={URL.createObjectURL(audioRecording.blob)} />
       )}
       <div className="container mx-auto mt-8">
         <h2 className="text-2xl text-blue-200 p-1 font-mono font-bold mb-1">Yaps:</h2>
         <div className="flex flex-col md:flex-row space-x-4 md:space-x-0">
-          {audioFiles.map((file) => (
-            <div key={file.id} className="mb-4 space-y-4 space-x-3 p-1">
-              <div className="flex border-t-2 justify-between items-center">
-                <div
-                  className="bg-cover bg-center mt-2 shadow-slate-400 shadow-lg w-10 h-10 rounded-full"
-                  style={{
-                    backgroundImage: `url(${file.photoURL})`,
-                  }}
-                ></div>
-                <p className="text-gray-600 text-xs bg-slate-50 font-mono shadow-md rounded-full max-w-fit p-2">
-                  {file.username}
-                </p>
-              </div>
-              <ReactAudioPlayer
-                src={file.url}
-                key={file.id}
-                className="w-full bg-white p-4 rounded-md shadow-sm outline-none"
-                controls
-                style={{
-                  width: '100%',
-                  borderRadius: '8px',
-                  padding: '8px',
-                  backgroundColor: '#ffffff',
-                  boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
-                }}
-              />
-              {file.tag && (
-                <p className="text-gray-600 border-t border-cyan-50 bg-white shadow-md hover:bg-indigo-50 font-mono text-xs p-1">
-                  {file.tag}
-                </p>
-              )}
-              {file.createdAt && (
-                <p style={{ fontSize: '10px' }} className="text-gray-600 bg-whitesmoke font-mono text-xs p-1">
-                  {format(file.createdAt.toDate(), 'MM·dd·yy - h:mm a')}
-                </p>
-              )}
+        {audioFiles.map((file) => (
+    <div key={file.id} className="mb-4 space-y-4 space-x-3 p-1">
+      <div className="flex border-t-2 justify-between items-center">
+        <div
+          className="bg-cover bg-center mt-2 shadow-slate-400 shadow-lg w-10 h-10 rounded-full"
+          style={{
+            backgroundImage: `url(${file.photoURL})`,
+          }}
+        ></div>
+        <p className="text-gray-600 text-xs bg-slate-50 font-mono shadow-md rounded-full max-w-fit p-2">
+          {file.username}
+        </p>
+      </div>
+      <div
+        className="w-full bg-white p-4 rounded-md shadow-sm outline-none cursor-pointer"
+        style={{
+          width: '100%',
+          borderRadius: '8px',
+          padding: '8px',
+          backgroundColor: '#ffffff',
+          boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
+        }}
+        onClick={() => handlePlayAudio(file.url)}
+      >
+        <div className="flex items-center justify-between">
+          <div>{file.username}</div>
+          <div>{file.tag}</div>
+        </div>
+      </div>
+      {file.createdAt && (
+        <p style={{ fontSize: '10px' }} className="text-gray-600 bg-whitesmoke font-mono text-xs p-1">
+          {format(file.createdAt.toDate(), 'MM·dd·yy - h:mm a')}
+        </p>
+      )}
               <button
-                className="bg-yellow-300 hover:bg-yellow-400 text-white py-1 px-2 rounded focus:outline-none mt-2"
+                className="bg-blue-200 hover:bg-blue-400 text-white py-1 px-2 rounded focus:outline-none mt-2"
                 onClick={() => handleReplyButtonClick(file.id)}
               >
                 Reply
@@ -303,34 +309,36 @@ const Chat = () => {
                 <ReplyComponent
                   recordingId={replyRecordingId}
                   handleReplyButtonClick={handleReplyButtonClick}
+                  fetchReplies={fetchReplies}
+                  
                 />
               )}
+              <div className='border border-indigo-50' />
+
+              <h1 className='font-mono  '>replies</h1>
+
+              
               {file.replies &&
-                file.replies.map((reply) => (
-                  <div
-                    key={reply.id}
-                    className="mt-4 bg-white p-4 rounded-md shadow-md"
-                  >
-                    <div className="flex items-center space-x-4">
-                      <div
-                        className="w-10 h-10 rounded-full bg-gray-200"
-                        style={{ backgroundImage: `url(${reply.photo})` }}
-                      ></div>
-                      <p className="text-gray-600 text-sm font-medium">
-                        {reply.username}
-                      </p>
-                    </div>
-                    <ReactAudioPlayer
-                      src={reply.url}
-                      className="mt-2"
-                      controls
-                    />
-                    <p className="text-gray-500 text-sm mt-2">{reply.tag}</p>
-                    <p className="text-gray-500 text-xs mt-1">
-                      {format(reply.createdAt.toDate(), 'MM·dd·yy - h:mm a')}
-                    </p>
-                  </div>
-                ))}
+              file.replies.map((reply) => (
+                <div
+                  key={reply.id}
+                  className="mt-4 flex items-center space-between bg-white p-4 rounded-md shadow-md cursor-pointer"
+                  onClick={() => handlePlayAudio(reply.url)}
+                >
+     <div className="flex items-center space-x-4">
+  <div className="w-10 h-10 rounded-full bg-gray-200" style={{ backgroundImage: `url(${reply.photo})` }}></div>
+  <div className="flex flex-col">
+    <div className="flex  justify-between space-x-1">
+      <p className="font-bold">{reply.tag}</p>
+      <p className="text-gray-600 text-sm font-medium">{reply.username}</p>
+    </div>
+    <p className="text-gray-600 text-xs font-mono mt-1">{format(reply.createdAt.toDate(), 'MM·dd·yy - h:mm a')}</p>
+  </div>
+</div>
+                 
+                </div>
+              ))}
+
             </div>
           ))}
         </div>
