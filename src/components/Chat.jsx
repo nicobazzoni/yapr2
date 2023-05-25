@@ -18,6 +18,9 @@ const Chat = () => {
   const [showReply, setShowReply] = useState(false);
   const [replyRecordingId, setReplyRecordingId] = useState('');
   const [replies, setReplies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioPlaying , setAudioPlaying] = useState(false);
 
   const { currentUser } = useContext(AuthContext);
 
@@ -83,6 +86,7 @@ const Chat = () => {
 
   const handleStartRecording = () => {
     setIsRecording(true);
+    setIsPlaying(true);
     const audioRecorder = audioRecorderRef.current;
     if (audioRecorder) {
       const chunks = [];
@@ -100,7 +104,9 @@ const Chat = () => {
   
 
   const handleStopRecording = () => {
+    
     setIsRecording(false);
+    setIsPlaying(false);
     const audioRecorder = audioRecorderRef.current;
     if (audioRecorder) {
       audioRecorder.stop();
@@ -108,6 +114,9 @@ const Chat = () => {
   };
 
   const handlePlayback = () => {
+   
+   
+   
     const audioPlayer = audioPlayerRef.current;
     if (audioPlayer) {
       audioPlayer.play();
@@ -208,6 +217,8 @@ const Chat = () => {
   }, []);
 
   const handlePlayAudio = (url) => {
+    setAudioPlaying(true);
+   
     const audioPlayer = new Audio(url);
     audioPlayer.play();
   };
@@ -215,27 +226,27 @@ const Chat = () => {
 
 
   return (
-<div className="flex flex-col items-center mt-8 lg:flex-row lg:flex-wrap lg:justify-center">
+    <div className="mt-8">
       <h2 className="text-2xl font-bold mb-4">Chat</h2>
       {currentUser && user && user.username && user.photo && (
         <h3 className="text-lg font-semibold mb-2">Logged in as: {user.username}</h3>
       )}
-      <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+      <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:space-x-2">
         <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:space-x-2">
           <button
-            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none"
+            className={`bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none ${isPlaying ? 'animate-pulse' : ''}`}
             onClick={handleStartRecording}
           >
             Talk
           </button>
           <button
-            className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none"
+            className="bg-rose-500 hover:bg-rose-600 text-black py-2 px-4 rounded focus:outline-none"
             onClick={handleStopRecording}
           >
             Stop
           </button>
           <button
-            className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded focus:outline-none"
+            className="bg-black hover:bg-green-600 text-white py-2 px-4 rounded focus:outline-none"
             onClick={handlePlayback}
           >
             Listen
@@ -250,57 +261,58 @@ const Chat = () => {
             className="px-2 py-1 border rounded focus:outline-none"
             maxLength={10}
           />
-       <button
-        className="bg-yellow-300 mt-2 hover:bg-rose-600 text-white py-2 px-4 rounded focus:outline-none"
-        onClick={() => handleSave(audioRecording, tag, user)}
-      >
-        Save
-      </button>
+          <button
+            className="bg-slate-200 mt-2 hover:bg-rose-600 text-black py-2 px-4 rounded focus:outline-none"
+            onClick={() => handleSave(audioRecording, tag, user)}
+          >
+            Save
+          </button>
         </div>
       </div>
-
+  
       {audioRecording && (
         <audio ref={audioPlayerRef} src={URL.createObjectURL(audioRecording.blob)} />
       )}
-      <div className="container mx-auto lg:w-1/2 mt-8">
+  
+      <div className="container mx-auto mt-8">
         <h2 className="text-2xl text-blue-200 p-1 font-mono font-bold mb-1">Yaps:</h2>
         
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 ">
-        {audioFiles.map((file) => (
-    <div key={file.id} className="mb-4 space-y-4 space-x-3 p-1">
-      <div className="flex border-t-2 justify-between items-center bg-slate-100">
-        <div
-          className="bg-cover bg-center mt-2 shadow-slate-400 shadow-lg w-20 h-10 rounded-sm"
-          style={{
-            backgroundImage: `url(${file.photoURL})`,
-          }}
-        ></div>
-        <p className="text-gray-600 text-xs bg-slate-50 font-mono shadow-md rounded-full max-w-fit p-2">
-          {file.username}
-        </p>
-      </div>
-      <div
-        className="w-full bg-white p-4 rounded-md shadow-sm outline-none cursor-pointer"
-        style={{
-          width: '100%',
-          borderRadius: '8px',
-          padding: '8px',
-          backgroundColor: '#ffffff',
-          boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
-        }}
-        onClick={() => handlePlayAudio(file.url)}
-      >
-        <div className="flex items-center  justify-between">
-          <div>{file.username}</div>
-          <div>{file.tag}</div>
-        </div>
-      </div>
-      {file.createdAt && (
-        <p style={{ fontSize: '10px' }} className="text-gray-600 bg-whitesmoke font-mono text-xs p-1">
-          {format(file.createdAt.toDate(), 'MM·dd·yy - h:mm a')}
-        </p>
-      )}
-      <div className='border lg:w-1/2 border-spacing-14' />
+        <div className="space-y-4">
+          {audioFiles.map((file) => (
+            <div key={file.id} className="bg-whitesmoke space-y-2 border-t border-black space-x-3 p-1">
+              <div className="flex border-t-3 border-y-slate-950 justify-between items-center bg-white">
+                <div
+                  className="bg-cover bg-center mt-2 shadow-slate-400 shadow-lg w-20 h-10 rounded-sm"
+                  style={{
+                    backgroundImage: `url(${file.photoURL})`,
+                  }}
+                ></div>
+                <p className="text-gray-600 text-xs bg-slate-50 font-mono shadow-md rounded-full max-w-fit p-2">
+                  {file.username}
+                </p>
+              </div>
+              <div
+                className={`w-full bg-white p-4  rounded-md shadow-sm outline-none cursor-pointer ${audioPlaying ? 'animation-pulse' : ''}`}
+                style={{
+                  width: '100%',
+                  borderRadius: '8px',
+                  padding: '4px',
+                  backgroundColor: '#ffffff',
+                  boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
+                }}
+                onClick={() => handlePlayAudio(file.url)}
+              >
+                <div className="flex items-center justify-between">
+                  <div>{file.username}</div>
+                  <div>{file.tag}</div>
+                </div>
+              </div>
+              {file.createdAt && (
+                <p style={{ fontSize: '10px' }} className="text-gray-600 bg-whitesmoke font-mono text-xs p-1">
+                  {format(file.createdAt.toDate(), 'MM·dd·yy - h:mm a')}
+                </p>
+              )}
+              <div className='border lg:w-1/2 border-spacing-14' />
               <button
                 className="bg-blue-200 hover:bg-blue-400 text-white py-1 px-2 rounded focus:outline-none mt-2"
                 onClick={() => handleReplyButtonClick(file.id)}
@@ -312,43 +324,40 @@ const Chat = () => {
                   recordingId={replyRecordingId}
                   handleReplyButtonClick={handleReplyButtonClick}
                   fetchReplies={fetchReplies}
-                  
                 />
               )}
-              <div className='border border-indigo-50 ' />
-
-              <h1 className='font-mono  '>replies</h1>
-              <div className=''>
-              
+           
+  
+              <h1 className='font-mono text-xs text-indigo-200 text-bold'>replies</h1>
+              <div>
               {file.replies &&
-              file.replies.map((reply) => (
-                <div
-                  key={reply.id}
-                  className="mt-4 flex max-w-fit items-center space-between bg-whitemsoke p-4 rounded-md shadow-md cursor-pointer"
-                  onClick={() => handlePlayAudio(reply.url)}
-                >
-     <div className="flex bg-white items-center max-w-fit space-x-4">
-  <div  className="bg-cover  bg-center mt-2 shadow-slate-400 shadow-lg w-10 h-10 rounded-full" style={{ backgroundImage: `url(${reply.photo})` }}></div>
-  <div className="flex flex-col">
-    <div className="flex  justify-between border-t space-x-1">
-      <p className="font-bold">{reply.tag}</p>
-      <p className="text-gray-600 text-sm font-medium">{reply.username}</p>
-    </div>
-    <p className="text-gray-600 text-xs font-mono mt-1">{format(reply.createdAt.toDate(), 'MM·dd·yy - h:mm a')}</p>
-  </div>
+    file.replies.map((reply) => (
+      <div
+        key={reply.id}
+        className="mt-4 relative bg-slate-50 p-4 rounded-md shadow-md cursor-pointer"
+        onClick={() => handlePlayAudio(reply.url)}
+      >
+        <div className="relative">
+          <div className="bg-cover bg-center mt-2 shadow-slate-400 shadow-lg w-10 h-10 rounded-full" style={{ backgroundImage: `url(${reply.photo})` }}></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            {reply.tag && <div className="bg-gray-200 text-gray-800 py-1 px-2 rounded">{reply.tag}</div>}
+          </div>
+        </div>
+        <p className="text-gray-600 text-xs font-mono mt-1">{format(reply.createdAt.toDate(), 'MM·dd·yy - h:mm a')}</p>
+        <div className="absolute top-0 right-0 transform translate-x-2 -translate-y-2">
+          <a href={`/profile/${reply.username}`} className="bg-blue-500 text-white px-2 py-1 rounded font-medium">{reply.username}</a>
+        </div>
+      </div>
+    ))}
+            </div>
 
-
-</div>
-              
-                </div>
-              ))}
-
-            </div> </div>  
+            </div>
           ))}
         </div>
       </div>
     </div>
   );
+  
 };
 
 export default Chat;

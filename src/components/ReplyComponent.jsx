@@ -15,6 +15,7 @@ const ReplyComponent = ({ recordingId,  }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const replyId = uuid()
+  const [replyPlay, setReplyPlay] = useState(false);
 
   const { currentUser } = useContext(AuthContext);
 
@@ -48,7 +49,9 @@ const ReplyComponent = ({ recordingId,  }) => {
   };
 
   const handleStartRecording = () => {
+   
     setIsRecording(true);
+    setReplyPlay(true);
 
     navigator.mediaDevices
       .getUserMedia({ audio: true })
@@ -77,6 +80,7 @@ const ReplyComponent = ({ recordingId,  }) => {
 
   const handleStopRecording = () => {
     setIsRecording(false);
+    setReplyPlay(false);
 
     const mediaRecorder = mediaRecorderRef.current;
     if (mediaRecorder && mediaRecorder.state === 'recording') {
@@ -153,7 +157,7 @@ const ReplyComponent = ({ recordingId,  }) => {
       <h2 className="text-2xl font-bold mb-4">Reply</h2>
       <div className="flex space-x-4">
         <button
-          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none"
+            className={`bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none ${replyPlay ? 'animate-pulse' : ''}`}
           onClick={handleStartRecording}
         >
           Talk
@@ -165,7 +169,7 @@ const ReplyComponent = ({ recordingId,  }) => {
           Stop
         </button>
       </div>
-      <audio ref={audioPlayerRef} autoPlay controls />
+      <audio ref={audioPlayerRef} autoPlay  />
       <div className="flex items-center">
         <input
           type="text"
