@@ -287,7 +287,7 @@ const Chat = () => {
 
   return (
     <div className="mt-8">
-      <img src={yicon} className="w-12 h-12 rounded-full mx-auto" />
+      <img src={yicon} className="w-12 h-12 border  rounded-full mx-auto" />
       <h2 className="text-sm bg-yellow-300 flex max-w-fit font-bold p-1 font-mono tracking-widest mb-4">voice</h2>
       {currentUser && user && user.username && user.photo && (
         <h3 className="text-lg font-semibold mb-2">Logged in as:{user && user.username}</h3>

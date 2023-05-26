@@ -90,15 +90,17 @@ const navigate = useNavigate();
         <HiOutlineMicrophone className="text-black  rounded-full hover:bg-blue-200 hover:animate-pulse cursor-pointer" onClick={goToVoicecall} />
       <nav className={`navbar ${isMenuOpen ? 'open' : ''}`}>
         
-      <div className="navbar-brand flex  items-center">
+      <div className="navbar-brand flex p-1  items-center">
        
       {user ? (
   location.pathname === '/form' ||
   location.pathname.startsWith('/details/') ||
   location.pathname.startsWith('/profile/') ||
   location.pathname.startsWith('/username') ||
+
+  location.pathname.startsWith('/voicecall') ||
   location.pathname.startsWith('/chat') ? (
-    <RiHomeLine className="text-black ml-11" onClick={backHome} />
+    <RiHomeLine className="text-black ml-11 cursor-pointer hover:bg-lime-500" onClick={backHome} />
   ) : (
     <a href={`/profile/${user.username}`} className="font-mono rounded-full hover:bg-blue-200 hover:text-red-500 text-black text-xs ml-8 font-bold bg-slate-100">
       {user.username}
@@ -114,11 +116,14 @@ const navigate = useNavigate();
       </nav>
       <ul className={`flex items-center justify-items-center  space-x-4 text-sm text-blue-500 ${isMenuOpen ? 'open' : ''}`}>
         {user ? (
-          <li>
-            
-            <AiOutlineUser className="text-black  cursor-pointer rounded-full hover:bg-blue-200"  onClick={handleSignOut}>Sign Out</AiOutlineUser>
-       
-          </li>
+        <li>
+        <span className="relative">
+          <AiOutlineUser className="text-black cursor-pointer rounded-full hover:bg-blue-200" onClick={handleSignOut} />
+          <div className="absolute top-0 left-0 p-2 bg-white-200 text-gray-800 text-sm rounded shadow-md opacity-0 hover:opacity-100 transition-opacity duration-300">
+            sign out
+          </div>
+        </span>
+      </li>
 
         ) : (
           <li className="font-mono text-blue-200">

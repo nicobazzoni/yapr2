@@ -6,11 +6,29 @@ import { FaHeart } from 'react-icons/fa';
 import { AuthContext } from '../contexts/AuthContext';
 
 const LikeButton = ({ uploadId, initialLikes }) => {
-  const [likes, setLikes] = useState(0);
+  const [likes, setLikes] = useState(initialLikes || 0);
   const [isLiked, setIsLiked] = useState(false);
   const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
+    const fetchLikes = async (itemId) => {
+      try {
+        const likesRef = firestore.collection('likes').where('itemId', '==', itemId);
+        const likesSnapshot = await likesRef.get();
+    
+        const likesCount = likesSnapshot.size;
+     console.log(likesCount)
+        setLikes((prevLikes) => ({
+          ...prevLikes,
+          [itemId]: likesCount,
+         
+        }));
+      } catch (error) {
+        console.error('Error fetching likes:', error);
+      }
+    };
+    
+
     const checkUserLikeStatus = async () => {
       try {
         const userId = currentUser?.uid;
@@ -20,6 +38,7 @@ const LikeButton = ({ uploadId, initialLikes }) => {
           .collection('likes');
         const userLikeDoc = await likesRef.doc(userId).get();
         const userLiked = userLikeDoc.exists;
+        
 
         setIsLiked(userLiked);
       } catch (error) {
@@ -27,7 +46,21 @@ const LikeButton = ({ uploadId, initialLikes }) => {
       }
     };
 
+    const unsubscribe = firestore
+      .collection('uploads')
+      .doc(uploadId)
+      .collection('likes')
+      .onSnapshot((snapshot) => {
+        const likesCount = snapshot.size;
+        setLikes(likesCount);
+      });
+
+    fetchLikes();
     checkUserLikeStatus();
+
+    return () => {
+      unsubscribe();
+    };
   }, [currentUser, uploadId]);
 
   const handleLike = async () => {
@@ -41,12 +74,10 @@ const LikeButton = ({ uploadId, initialLikes }) => {
       if (isLiked) {
         // If already liked, remove the like
         await likesRef.doc(userId).delete();
-        setLikes((prevLikes) => prevLikes - 1);
         setIsLiked(false);
       } else {
         // If not liked, add the like
         await likesRef.doc(userId).set({});
-        setLikes((prevLikes) => prevLikes + 1);
         setIsLiked(true);
       }
     } catch (error) {
@@ -63,7 +94,7 @@ const LikeButton = ({ uploadId, initialLikes }) => {
         }`}
         onClick={handleLike}
       />
-      <span style={{ fontSize: 10}} className="ml-2 text-sm">{likes}</span>
+      <span style={{ fontSize: 10 }} className="ml-2 text-sm">{likes}</span>
     </div>
   );
 };
