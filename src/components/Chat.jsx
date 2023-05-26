@@ -6,6 +6,9 @@ import { format } from 'date-fns';
 import ReactAudioPlayer from 'react-audio-player';
 import { v4 as uuid } from 'uuid';
 import ReplyComponent from './ReplyComponent';
+import { MdDelete } from 'react-icons/md';
+import RandomImageGenerator from './RandomImageGenerator';
+import axios from 'axios';
 
 const Chat = () => {
   const [audioRecording, setAudioRecording] = useState(null);
@@ -20,7 +23,7 @@ const Chat = () => {
   const [replies, setReplies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [audioPlaying , setAudioPlaying] = useState(false);
+  const [audioPlaying, setAudioPlaying] = useState(false);
 
   const { currentUser } = useContext(AuthContext);
 
@@ -101,10 +104,8 @@ const Chat = () => {
       audioRecorder.start();
     }
   };
-  
 
   const handleStopRecording = () => {
-    
     setIsRecording(false);
     setIsPlaying(false);
     const audioRecorder = audioRecorderRef.current;
@@ -114,9 +115,6 @@ const Chat = () => {
   };
 
   const handlePlayback = () => {
-   
-   
-   
     const audioPlayer = audioPlayerRef.current;
     if (audioPlayer) {
       audioPlayer.play();
@@ -134,13 +132,13 @@ const Chat = () => {
       const username = user.username;
       const photo = user.photoURL;
       const uid = currentUser.uid;
-  
+
       try {
         const audioFileRef = storageRef.child(`audio/${username}/${filename}`);
         await audioFileRef.put(recording.blob);
-  
+
         const audioFileUrl = await audioFileRef.getDownloadURL();
-  
+
         const audioFileDoc = db.collection('audioFiles').doc();
         const docId = audioFileDoc.id;
         await audioFileDoc.set({
@@ -152,7 +150,7 @@ const Chat = () => {
           url: audioFileUrl,
           replyTo: replyRecordingId,
         });
-  
+
         setTag('');
         handleReplyButtonClick(''); // Call the handleReplyButtonClick function with an empty string
       } catch (error) {
@@ -162,9 +160,6 @@ const Chat = () => {
       console.log('Missing user, audio recording, or tag');
     }
   };
-  
-  
-  
 
   const fetchReplies = async (audioFileId) => {
     try {
@@ -218,12 +213,48 @@ const Chat = () => {
 
   const handlePlayAudio = (url) => {
     setAudioPlaying(true);
-   
+
     const audioPlayer = new Audio(url);
     audioPlayer.play();
   };
 
+  const handleDelete = (id, username) => {
+    if (user && user.username === username) {
+      firestore
+        .collection('audioFiles')
+        .doc(id)
+        .delete()
+        .then(() => {
+          console.log('Document successfully deleted!');
+          // show a success message
+        })
+        .catch((error) => {
+          console.error('Error removing document: ', error);
+          // handle the error
+        });
+    } else {
+      console.log('You are not authorized to delete this document.');
+      // handle the error
+    }
+  };
 
+  const handleReplyDelete = async (id, username) => {
+    if (user && user.username === username) {
+      try {
+        await firestore.collection('audioReplies').doc(id).delete();
+        console.log('Document successfully deleted!');
+
+        // Update the state by removing the deleted reply from the replies array
+        setReplies((prevReplies) => prevReplies.filter((reply) => reply.id !== id));
+      } catch (error) {
+        console.error('Error removing document: ', error);
+        // handle the error
+      }
+    } else {
+      console.log('You are not authorized to delete this document.');
+      // handle the error
+    }
+  };
 
   return (
     <div className="mt-8">
@@ -257,9 +288,9 @@ const Chat = () => {
             type="text"
             value={tag}
             onChange={(e) => setTag(e.target.value)}
-            placeholder="tag (max 10 characters)"
+            placeholder="tag (max 120 characters)"
             className="px-2 py-1 border rounded focus:outline-none"
-            maxLength={10}
+            maxLength={120}
           />
           <button
             className="bg-slate-200 mt-2 hover:bg-rose-600 text-black py-2 px-4 rounded focus:outline-none"
@@ -269,30 +300,36 @@ const Chat = () => {
           </button>
         </div>
       </div>
-  
+
       {audioRecording && (
         <audio ref={audioPlayerRef} src={URL.createObjectURL(audioRecording.blob)} />
       )}
-  
+
       <div className="container mx-auto mt-8">
         <h2 className="text-2xl text-blue-200 p-1 font-mono font-bold mb-1">Yaps:</h2>
-        
+
         <div className="space-y-4">
           {audioFiles.map((file) => (
             <div key={file.id} className="bg-whitesmoke space-y-2 border-t border-black space-x-3 p-1">
-              <div className="flex border-t-3 border-y-slate-950 justify-between items-center bg-white">
-                <div
-                  className="bg-cover bg-center mt-2 shadow-slate-400 shadow-lg w-20 h-10 rounded-sm"
+              <div className="flex justify-center">
+                {/* <RandomImageGenerator /> */}
+                <button
+                  className="bg-cover bg-center mt-2 shadow-slate-400 shadow-lg w-24 h-16 rounded-sm"
                   style={{
                     backgroundImage: `url(${file.photoURL})`,
                   }}
-                ></div>
-                <p className="text-gray-600 text-xs bg-slate-50 font-mono shadow-md rounded-full max-w-fit p-2">
+                  onClick={() => handlePlayAudio(file.url)}
+                ></button>
+              </div>
+              <div className="flex border-t-3 border-y-slate-950 justify-between items-center bg-white">
+                <p className="text-gray-600 text-xs bg-slate-50 hover:bg-rose-500 font-mono shadow-md rounded-full max-w-fit p-2">
                   {file.username}
                 </p>
               </div>
               <div
-                className={`w-full bg-white p-4  rounded-md shadow-sm outline-none cursor-pointer ${audioPlaying ? 'animation-pulse' : ''}`}
+                className={`w-full bg-white p-4 rounded-md hover:bg-slate-500 shadow-sm outline-none cursor-pointer ${
+                  audioPlaying ? 'animation-pulse' : ''
+                }`}
                 style={{
                   width: '100%',
                   borderRadius: '8px',
@@ -302,17 +339,25 @@ const Chat = () => {
                 }}
                 onClick={() => handlePlayAudio(file.url)}
               >
-                <div className="flex items-center justify-between">
-                  <div>{file.username}</div>
-                  <div>{file.tag}</div>
-                </div>
+                <div>{file.tag}</div>
+                {currentUser && file.username === user.username && (
+                  <div className="">
+                    <MdDelete
+                      className="bg-red-500 hover:bg-red-600 text-white py-1 px-2 text-xs rounded focus:outline-none"
+                      onClick={() => handleDelete(file.id, file.username)}
+                    />
+                  </div>
+                )}
               </div>
               {file.createdAt && (
                 <p style={{ fontSize: '10px' }} className="text-gray-600 bg-whitesmoke font-mono text-xs p-1">
                   {format(file.createdAt.toDate(), 'MM·dd·yy - h:mm a')}
                 </p>
               )}
-              <div className='border lg:w-1/2 border-spacing-14' />
+
+              {/* Reply component */}
+              <div className="border lg:w-1/2 border-spacing-14" />
+
               <button
                 className="bg-blue-200 hover:bg-blue-400 text-white py-1 px-2 rounded focus:outline-none mt-2"
                 onClick={() => handleReplyButtonClick(file.id)}
@@ -326,38 +371,51 @@ const Chat = () => {
                   fetchReplies={fetchReplies}
                 />
               )}
-           
-  
-              <h1 className='font-mono text-xs text-indigo-200 text-bold'>replies</h1>
-              <div>
-              {file.replies &&
-    file.replies.map((reply) => (
-      <div
-        key={reply.id}
-        className="mt-4 relative bg-slate-50 p-4 rounded-md shadow-md cursor-pointer"
-        onClick={() => handlePlayAudio(reply.url)}
-      >
-        <div className="relative">
-          <div className="bg-cover bg-center mt-2 shadow-slate-400 shadow-lg w-10 h-10 rounded-full" style={{ backgroundImage: `url(${reply.photo})` }}></div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            {reply.tag && <div className="bg-gray-200 text-gray-800 py-1 px-2 rounded">{reply.tag}</div>}
-          </div>
-        </div>
-        <p className="text-gray-600 text-xs font-mono mt-1">{format(reply.createdAt.toDate(), 'MM·dd·yy - h:mm a')}</p>
-        <div className="absolute top-0 right-0 transform translate-x-2 -translate-y-2">
-          <a href={`/profile/${reply.username}`} className="bg-blue-500 text-white px-2 py-1 rounded font-medium">{reply.username}</a>
-        </div>
-      </div>
-    ))}
-            </div>
 
+              <h1 className="font-mono text-xs text-indigo-200 text-bold">Replies</h1>
+              <div>
+                {file.replies &&
+                  file.replies.map((reply) => (
+                    <div
+                      key={reply.id}
+                      className="mt-4 relative bg-slate-50 p-4 rounded-md shadow-md hover:bg-yellow-200 cursor-pointer"
+                      onClick={() => handlePlayAudio(reply.url)}
+                    >
+                      <div className="relative">
+                        <div
+                          className="bg-cover bg-center mt-2 shadow-slate-400 shadow-lg w-10 h-10 rounded-full"
+                          style={{ backgroundImage: `url(${reply.photo})` }}
+                        ></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          {reply.tag && (
+                            <div className="bg-white text-gray-800 hover:bg-blue-400 py-1 px-2 rounded">{reply.tag}</div>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-gray-600 text-xs font-mono mt-1">
+                        {format(reply.createdAt.toDate(), 'MM·dd·yy - h:mm a')}
+                      </p>
+                      <div className="absolute top-0 right-0 transform translate-x-2 -translate-y-2">
+                        <a
+                          href={`/profile/${reply.username}`}
+                          className="bg-blue-500 text-white px-2 py-1 rounded font-medium"
+                        >
+                          {reply.username}
+                        </a>
+                      </div>
+                      <MdDelete
+                        className="bg-red-500 hover:bg-red-600 text-white py-1 px-2 text-xs rounded focus:outline-none mt-2 -translate-y-4 translate-x-1 absolute top-0 left-1"
+                        onClick={() => handleReplyDelete(reply.id, reply.username)}
+                      />
+                    </div>
+                  ))}
+              </div>
             </div>
           ))}
         </div>
       </div>
     </div>
   );
-  
 };
 
 export default Chat;

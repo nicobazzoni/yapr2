@@ -8,6 +8,12 @@ import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { MdPeopleOutline} from 'react-icons/md';
 import { HiOutlineMicrophone } from 'react-icons/hi';
+import {AiOutlineUser} from 'react-icons/ai';
+
+
+
+
+
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
@@ -110,7 +116,7 @@ const navigate = useNavigate();
         {user ? (
           <li>
             
-            <button className='' onClick={handleSignOut}>Sign Out</button>
+            <AiOutlineUser className="text-black  cursor-pointer rounded-full hover:bg-blue-200"  onClick={handleSignOut}>Sign Out</AiOutlineUser>
        
           </li>
 
