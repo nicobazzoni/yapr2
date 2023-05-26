@@ -30,7 +30,7 @@ function App() {
     <AuthProvider>
       <Router>
         <header>
-          <Header />
+          <Header user={user}  />
         </header>
         <Routes>
   <Route path="/" element={<Home  />}/>
