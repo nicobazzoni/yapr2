@@ -118,8 +118,11 @@ const ReplyComponent = ({ recordingId,  }) => {
   
         // Show toast message here
         toast.success('Reply saved successfully!');
+
+        window.location.reload();
         // Refresh data
         fetchReplies(); 
+
         
         // Replace fetchData with your actual function to fetch the data
       } catch (error) {
