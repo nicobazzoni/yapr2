@@ -176,8 +176,9 @@ const Chat = () => {
         id: doc.id,
         ...doc.data(),
       }));
-
+ console.log('repliesData', repliesData);
       return repliesData;
+     
     } catch (error) {
       console.error('Error fetching replies:', error);
       return [];
@@ -225,6 +226,24 @@ const Chat = () => {
     // Display a toast message
     toast(`Playing audio by ${username}. Tag: ${tag}`);
   };
+
+  const handlePlayReply = (url, file, reply) => {
+    setAudioPlaying(true);
+  
+    const { username, tag } = reply;
+    const Myusername = reply.username;
+    const Mytag = reply.tag;
+  
+    const audioPlayer = new Audio(url);
+    audioPlayer.play();
+  
+    // Display a toast message with the reply user data
+    toast(`Playing audio by ${Myusername}. Tag: ${Mytag}`);
+  };
+  
+  
+  
+
 
   const handleDelete = (id, username) => {
     if (user && user.username === username) {
@@ -392,7 +411,7 @@ const Chat = () => {
       <div
         key={reply.id}
         className="mt-4 relative bg-slate-50 p-4 rounded-md shadow-md hover:bg-yellow-200 cursor-pointer"
-        onClick={() => handlePlayAudio(reply.url, file)}
+        onClick={() => handlePlayReply(reply.url, file, reply)}
       >
         <div className="relative">
           <div
