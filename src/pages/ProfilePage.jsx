@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { firestore, storage } from '../../firebase';
 import LikeButton from '../components/LikeButton';
 import { AuthContext } from '../contexts/AuthContext';
+import FollowerList from '../components/FollowerList';
+
 
 const ProfilePage = () => {
   const { username } = useParams();
@@ -13,7 +15,7 @@ const ProfilePage = () => {
 
   const { currentUser } = useContext(AuthContext);
 
-
+  const { userId } = useParams();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -89,6 +91,9 @@ const ProfilePage = () => {
   };
   
 
+ 
+  
+
   const uploadProfilePhoto = async () => {
     if (selectedProfilePhoto) {
       try {
@@ -109,6 +114,11 @@ const ProfilePage = () => {
       }
     }
   };
+
+ 
+  
+  
+  
   
   
 
@@ -173,7 +183,7 @@ const ProfilePage = () => {
           ))}
         </div>
       </div>
-    </div>
+  </div>
   );
 };
 

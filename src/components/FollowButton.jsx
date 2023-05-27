@@ -8,6 +8,7 @@ import { AuthContext } from '../contexts/AuthContext';
 const FollowButton = ({ userId }) => {
   const { currentUser } = useContext(AuthContext);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
     const checkFollowStatus = async () => {
@@ -27,37 +28,64 @@ const FollowButton = ({ userId }) => {
       }
     };
 
+    const fetchUserData = async () => {
+      try {
+        const userRef = firestore.collection('users').doc(userId);
+        const userSnapshot = await userRef.get();
+
+        if (userSnapshot.exists) {
+          const userData = userSnapshot.data();
+          setUserData(userData);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
     checkFollowStatus();
+    fetchUserData();
   }, [currentUser, userId]);
+// ...
 
-  const handleFollow = async () => {
-    try {
-      const followerId = currentUser.uid;
-      const followedId = userId;
+const handleFollow = async () => {
+  try {
+    const followerId = currentUser.uid;
+    const followedId = userId;
 
-      // Create a new document in the "followers" collection
-      await firestore.collection('followers').doc().set({
-        followerId: followerId,
+    // Fetch the username of the user being followed
+    const followedUserSnapshot = await firestore.collection('users').doc(followedId).get();
+    const followedUser = followedUserSnapshot.data();
+    const followedUsername = followedUser.username;
+
+    // Create a new document in the "followers" collection
+    await firestore.collection('followers').doc().set({
+      followerId: followerId,
+      followedId: followedId,
+      followedUsername: followedUsername,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Update the user's "following" collection with the followed user's username
+    await firestore
+      .collection('users')
+      .doc(followerId)
+      .collection('following')
+      .doc(followedId)
+      .set({
+        followedUsername: followedUsername,
         followedId: followedId,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-      // Update the user's "following" collection
-      await firestore
-        .collection('users')
-        .doc(followerId)
-        .collection('following')
-        .doc(followedId)
-        .set({
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
+    setIsFollowing(true);
+    console.log('User followed successfully!');
+  } catch (error) {
+    console.error('Error following user:', error);
+  }
+};
 
-      setIsFollowing(true);
-      console.log('User followed successfully!');
-    } catch (error) {
-      console.error('Error following user:', error);
-    }
-  };
+// ...
+
 
   const handleUnfollow = async () => {
     try {
@@ -93,19 +121,16 @@ const FollowButton = ({ userId }) => {
 
   return (
     <div>
+      {userData && (
+       <></>
+      )}
       {isFollowing ? (
-        <button
-          className="text-blue-500 hover:text-blue-700"
-          onClick={handleUnfollow}
-        >
+        <button className="text-blue-500 hover:text-blue-700" onClick={handleUnfollow}>
           <RiUserUnfollowLine className="inline-block mr-1" />
           Unfollow
         </button>
       ) : (
-        <button
-          className="text-blue-500 hover:text-blue-700"
-          onClick={handleFollow}
-        >
+        <button className="text-blue-500 hover:text-blue-700" onClick={handleFollow}>
           <RiUserFollowLine className="inline-block mr-1" />
           Follow
         </button>

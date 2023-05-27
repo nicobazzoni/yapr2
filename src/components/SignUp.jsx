@@ -14,30 +14,56 @@ const SignUp = () => {
 
 const navigation = useNavigate()
 
-  const handleSignUp = async () => {
-    try {
-      const { user } = await auth.createUserWithEmailAndPassword(email, password);
+const handleSignUp = async () => {
+  try {
+    if (!email || !password || !username || !photoURL) {
+      setError('Please fill in all required fields');
+      return;
+    }
+
+    const { user } = await auth.createUserWithEmailAndPassword(email, password);
+    if (user) {
       await firestore.collection('users').doc(user.uid).set({
         email,
         username,
-        photoURL, // Save photo URL in the user document
+        photoURL,
+        likes: [],
+        followers: [],
+        following: [],
+        bio: null,
+        mood: null,
       });
-      navigation('/'); // Navigate to home screen
-    } catch (error) {
-      setError(error.message);
+      navigation('/');
     }
+  } catch (error) {
+    setError('Error signing up. Please try again later.');
+    console.error('Error signing up:', error);
+  }
+};
+
+
+
+const handlePhotoUpload = (event) => {
+  const file = event.target.files[0];
+
+  // Check if file size exceeds the limit (e.g., 2MB)
+  const fileSizeLimit = 5 * 1024 * 1024; // 5MB in bytes
+
+  if (file.size > fileSizeLimit) {
+    // Display an error message or take appropriate action
+    console.log('File size exceeds the limit');
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = (event) => {
+    setPhotoURL(event.target.result); // Set the photo URL in state
   };
 
-  const handlePhotoUpload = (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
+  reader.readAsDataURL(file);
+};
 
-    reader.onload = (event) => {
-      setPhotoURL(event.target.result); // Set the photo URL in state
-    };
-
-    reader.readAsDataURL(file);
-  };
 
   return (
     <div className="container mx-auto text-center">
