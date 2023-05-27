@@ -17,6 +17,7 @@ import ProfilePage from './pages/ProfilePage'
 import UsernamePage from './pages/UsernamePage'
 import VoiceCallRoom from './components/Chat'
 import Room from './components/Room'
+import Images from './pages/Images'
 
 
 function App() {
@@ -32,7 +33,7 @@ function App() {
           <div className="sticky top-0 z-50">
             <Header user={user} />
           </div>
-          <div className="container mx-auto">
+          <div className="container mx-auto overflow-x-hidden">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/signup" element={<SignUp />} />
@@ -42,6 +43,7 @@ function App() {
               <Route path="/details/:itemId" element={<DetailsPage />} />
               <Route path="/profile/:username" element={<ProfilePage />} />
               <Route path="/voicecall" element={<Room />} />
+              <Route path= "/images"  element={<Images/>} />
               <Route path="*" element={<h1>Not Found</h1>} />
             </Routes>
           </div>

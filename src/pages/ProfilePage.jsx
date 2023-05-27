@@ -1,13 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
-import { firestore } from '../../firebase';
+import { firestore, storage } from '../../firebase';
 import LikeButton from '../components/LikeButton';
+import { AuthContext } from '../contexts/AuthContext';
 
 const ProfilePage = () => {
   const { username } = useParams();
   const [user, setUser] = useState(null);
   const [uploads, setUploads] = useState([]);
   const [audioFiles, setAudioFiles] = useState([]);
+  const [selectedProfilePhoto, setSelectedProfilePhoto] = useState(null);
+
+  const { currentUser } = useContext(AuthContext);
+
+
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -18,8 +24,23 @@ const ProfilePage = () => {
         if (!userSnapshot.empty) {
           const userData = userSnapshot.docs[0].data();
           setUser(userData);
+          console.log(userData);
           const uid = userSnapshot.docs[0].id;
           await Promise.all([fetchUploads(uid), fetchAudioFiles(uid)]);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    const fetchUser = async (userId) => {
+      try {
+        const userRef = firestore.collection('users').doc(userId);
+        const userSnapshot = await userRef.get();
+  
+        if (userSnapshot.exists) {
+          const userData = userSnapshot.data();
+          setUser({ id: userSnapshot.id, ...userData });
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -57,7 +78,39 @@ const ProfilePage = () => {
     };
 
     fetchUserData();
+    fetchUser(currentUser.uid, username)
+    console.log( 'cheers', currentUser.uid, username);
   }, [username]);
+
+  //change profile photo
+
+  const handleProfilePhotoChange = (event) => {
+    setSelectedProfilePhoto(event.target.files[0]);
+  };
+  
+
+  const uploadProfilePhoto = async () => {
+    if (selectedProfilePhoto) {
+      try {
+        const storageRef = firestore.storage().ref();
+        const fileRef = storageRef.child(`profile-photos/${user.username}`);
+        await fileRef.put(selectedProfilePhoto);
+        const photoURL = await fileRef.getDownloadURL();
+  
+        // Update the user's profile with the new photoURL
+        await firestore.collection('users').doc(user.id).update({
+          photoURL: photoURL,
+        });
+  
+        // Reset the selected profile photo state
+        setSelectedProfilePhoto(null);
+      } catch (error) {
+        console.error('Error uploading profile photo:', error);
+      }
+    }
+  };
+  
+  
 
   return (
     <div className="justify-items-center items-start mt-10">
@@ -70,6 +123,14 @@ const ProfilePage = () => {
           <p className="text-sm bg-slate-500 border rounded-full text-white">
             <span className="font-bold font-mono mt-2 text-sm"></span> {user.email}
           </p>
+          { currentUser.uid === user.uid ? (
+            
+            <>
+              <input type="file" onChange={handleProfilePhotoChange} />
+              <button onClick={uploadProfilePhoto}>Upload Profile Photo</button>
+              {/* Add form for bio update */}
+            </>
+        ) : null}
         </div>
       )}
 
@@ -81,21 +142,25 @@ const ProfilePage = () => {
             </div>
             <p className="text-gray-600 bg-white text-center">{upload.message}</p>
             <p className="text-xs mt-1 bg-black text-white text-center">{upload.tag}</p>
+            
+            
             <LikeButton initialLikes={upload.likes} uploadId={upload.id} user={user} />
-            {upload.likes && upload.likes.length > 0 && (
-  <div className="flex justify-center mt-1">
-    <span className="text-gray-600 font-mono text-sm">Liked by: </span>
-    {upload.likes.map((like, index) => (
-      <span key={index} className="text-blue-500 font-mono text-sm">
-        {like}
-        {index < upload.likes.length - 1 && <span className="text-gray-600">, </span>}
-      </span>
-    ))}
-  </div>
-)}
-          </div>
-        ))}
-      </div>
+            
+            
+            {upload.likes && Array.isArray(upload.likes) && upload.likes.length > 0 && (
+            <div className="flex justify-center mt-1">
+              <span className="text-gray-600 font-mono text-sm">Liked by: </span>
+              {upload.likes.map((like, index) => (
+                <span key={index} className="text-blue-500 font-mono text-sm">
+                  {like}
+                  {index < upload.likes.length - 1 && <span className="text-gray-600">, </span>}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
 
       <div className="mt-8">
         <h2 className="text-2xl font-bold mb-4">Audio Files</h2>
