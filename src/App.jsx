@@ -26,32 +26,29 @@ function App() {
 
   return (
     <>
-     <ToastContainer />
-    <AuthProvider>
-      <Router>
-        <header>
-          <Header user={user}  />
-        </header>
-        <Routes>
-  <Route path="/" element={<Home  />}/>
-  <Route path="/signup" element={<SignUp />} />
-  <Route path="/signin" element={<SignIn />} />
-  <Route path="/form" element={<UploadForm user={user} />} />
-  <Route path="/username" element={<UsernamePage />} />
-  <Route path="/details/:itemId" element={<DetailsPage />} />
-  <Route path="/profile/:username" element={<ProfilePage />} />
-  <Route path="/voicecall" element={<Room />} />
-
-
-
-  <Route path="*" element={<h1>Not Found</h1>} />
-</Routes>
-     
-      </Router>
+      <ToastContainer />
+      <AuthProvider>
+        <Router>
+          <div className="sticky top-0 z-50">
+            <Header user={user} />
+          </div>
+          <div className="container mx-auto">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/signin" element={<SignIn />} />
+              <Route path="/form" element={<UploadForm user={user} />} />
+              <Route path="/username" element={<UsernamePage />} />
+              <Route path="/details/:itemId" element={<DetailsPage />} />
+              <Route path="/profile/:username" element={<ProfilePage />} />
+              <Route path="/voicecall" element={<Room />} />
+              <Route path="*" element={<h1>Not Found</h1>} />
+            </Routes>
+          </div>
+        </Router>
       </AuthProvider>
-    
     </>
-  )
+  );
 }
 
-export default App
+export default App;

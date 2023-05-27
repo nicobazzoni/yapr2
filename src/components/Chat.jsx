@@ -26,6 +26,7 @@ const Chat = () => {
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
+  
 
   const { currentUser } = useContext(AuthContext);
 
@@ -152,6 +153,13 @@ const Chat = () => {
           tag: tag,
           url: audioFileUrl,
           replyTo: replyRecordingId,
+        });
+        toast(<CustomToast />, {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 3000, // Adjust the duration as needed
+          hideProgressBar: true,
+          closeButton: false,
+          draggable: false,
         });
 
         setTag('');
@@ -282,6 +290,22 @@ const Chat = () => {
       // handle the error
     }
   };
+
+  const CustomToast = ({ closeToast }) => (
+    <div className="flex items-center bg-blue-600 text-white text-sm font-medium px-4 py-3" role="alert">
+      <div className="w-4 h-4 mr-2">
+        <img src={yicon} alt="MyIcon" />
+      </div>
+      <div>
+        <p>Your yap was shared!</p>
+      </div>
+      <div className="ml-auto pl-3">
+        <svg className="h-6 w-6" role="button" onClick={closeToast} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M10 9a1 1 0 011-1h3a1 1 0 110 2h-3a1 1 0 01-1-1zM10 11a1 1 0 011-1h3a1 1 0 110 2h-3a1 1 0 01-1-1zM6 9a1 1 0 011-1h.01a1 1 0 110 2H7a1 1 0 01-1-1zM6 11a1 1 0 011-1h.01a1 1 0 110 2H7a1 1 0 01-1-1z" clipRule="evenodd" />
+        </svg>
+      </div>
+    </div>
+  );
  
   
 
@@ -372,6 +396,9 @@ const Chat = () => {
           padding: '4px',
           backgroundColor: '#ffffff',
           boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
+          
+          
+             
         }}
         onClick={() => handlePlayAudio(file.url, file)}
       >
