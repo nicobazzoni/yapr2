@@ -124,10 +124,23 @@ const [formVisible, setFormVisible] = useState(false);
 
   const handlePlayback = () => {
     const audioPlayer = audioPlayerRef.current;
+  
     if (audioPlayer) {
-      audioPlayer.play();
+      const playPromise = audioPlayer.play();
+  
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            // Audio playback started successfully
+          })
+          .catch((error) => {
+            // Error occurred while starting audio playback
+            console.error('Error playing audio:', error);
+          });
+      }
     }
   };
+  
 
   const handleReplyButtonClick = (recordingId) => {
     setShowReply(true);
@@ -149,14 +162,14 @@ const [formVisible, setFormVisible] = useState(false);
 
   const handleSave = async (recording, tag, user) => {
     if (user && user.username && user.photoURL && recording && tag && selectedImage) {
-      const filename = `${uuid()}.wav`; // Generate a unique filename using uuid()
+      const filename = `${uuid()}.m4a`; // Generate a unique filename using uuid()
       const username = user.username;
       const photo = user.photoURL;
       const uid = currentUser.uid;
   
       try {
         const audioFileRef = storageRef.child(`audio/${username}/${filename}`);
-        await audioFileRef.put(recording.blob);
+        await audioFileRef.put(recording.blob, { contentType: 'audio/mp4' }); // Specify the content type as MP4 (AAC format)
         const audioFileUrl = await audioFileRef.getDownloadURL();
   
         const imageRef = storageRef.child(`images/${selectedImage.name}`);
@@ -194,6 +207,8 @@ const [formVisible, setFormVisible] = useState(false);
       console.log('Missing user, audio recording, tag, or image');
     }
   };
+  
+  
   
   
   
@@ -396,14 +411,7 @@ const [formVisible, setFormVisible] = useState(false);
   Save
 </button>
         </div>
-        <div className="fixed bottom-10 right-10">
-        <button
-          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none"
-          onClick={handleFormToggle}
-        >
-          {formVisible ? 'Hide Form' : 'Show Form'}
-        </button>
-      </div>
+      
       </div>
 
       {audioRecording && (
@@ -418,7 +426,7 @@ const [formVisible, setFormVisible] = useState(false);
     <div key={file.id} className="bg-whitesmoke space-y-2 border-t border-black space-x-3 p-1">
       <div className="flex justify-center">
         <button
-          className=" bg-cover bg-center mt-2 shadow-slate-400 shadow-lg  w-full h-52 rounded-sm"
+          className=" bg-contain  bg-center mt-2 shadow-slate-400 shadow-lg  w-full h-52 rounded-sm"
           style={{
             backgroundImage: `url(${file.image})`,
           }}
