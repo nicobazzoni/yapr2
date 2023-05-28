@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import Chat from './Chat';
-import AudioFileList from './AudioFileList';
+
 import { firestore, auth} from '../../firebase';
 
 const Room = () => {
@@ -64,7 +64,7 @@ const Room = () => {
   return (
     <div>
       <Chat audioFiles={audioFiles} currentUser={currentUser} />
-      {/* <AudioFileList audioFiles={audioFiles} currentUser={currentUser} /> */}
+     
     </div>
   );
 };

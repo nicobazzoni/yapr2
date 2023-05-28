@@ -26,6 +26,10 @@ const Chat = () => {
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+const [imageURL, setImageURL] = useState('');
+const [selectedPhoto, setSelectedPhoto] = useState(null);
+const [formVisible, setFormVisible] = useState(false); 
   
 
   const { currentUser } = useContext(AuthContext);
@@ -130,19 +134,35 @@ const Chat = () => {
     setReplyRecordingId(recordingId);
   };
 
+  const uploadImage = async () => {
+    if (selectedImage) {
+      try {
+        const storageRef = storageRef.child(`images/${selectedImage.name}`);
+        await storageRef.put(selectedImage);
+        const imageURL = await storageRef.getDownloadURL();
+        setImageURL(imageURL);
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
+    }
+  };
+
   const handleSave = async (recording, tag, user) => {
-    if (user && user.username && user.photoURL && recording && tag) {
-      const filename = `${replyRecordingId}.wav`;
+    if (user && user.username && user.photoURL && recording && tag && selectedImage) {
+      const filename = `${uuid()}.wav`; // Generate a unique filename using uuid()
       const username = user.username;
       const photo = user.photoURL;
       const uid = currentUser.uid;
-
+  
       try {
         const audioFileRef = storageRef.child(`audio/${username}/${filename}`);
         await audioFileRef.put(recording.blob);
-
         const audioFileUrl = await audioFileRef.getDownloadURL();
-
+  
+        const imageRef = storageRef.child(`images/${selectedImage.name}`);
+        await imageRef.put(selectedImage);
+        const imageURL = await imageRef.getDownloadURL();
+  
         const audioFileDoc = db.collection('audioFiles').doc();
         const docId = audioFileDoc.id;
         await audioFileDoc.set({
@@ -153,24 +173,30 @@ const Chat = () => {
           tag: tag,
           url: audioFileUrl,
           replyTo: replyRecordingId,
+          image: imageURL,
         });
+  
         toast(<CustomToast />, {
           position: toast.POSITION.TOP_RIGHT,
-          autoClose: 3000, // Adjust the duration as needed
+          autoClose: 3000,
           hideProgressBar: true,
           closeButton: false,
           draggable: false,
         });
-
+  
         setTag('');
+        setSelectedImage(null); // Reset selected image state
         handleReplyButtonClick(''); // Call the handleReplyButtonClick function with an empty string
       } catch (error) {
         console.error('Error saving audio file:', error);
       }
     } else {
-      console.log('Missing user, audio recording, or tag');
+      console.log('Missing user, audio recording, tag, or image');
     }
   };
+  
+  
+  
 
   const fetchReplies = async (audioFileId) => {
     try {
@@ -249,7 +275,7 @@ const Chat = () => {
     toast(`Playing audio by ${Myusername}. Tag: ${Mytag}`);
   };
   
-  
+ 
   
 
 
@@ -306,7 +332,17 @@ const Chat = () => {
       </div>
     </div>
   );
- 
+
+
+  const handlePhotoChange = (e) => {
+    if (e.target.files[0]) {
+      setSelectedImage(e.target.files[0]);
+    }
+  };
+  
+  const handleFormToggle = () => {
+    setFormVisible(!formVisible);
+  };
   
 
   return (
@@ -346,13 +382,28 @@ const Chat = () => {
             className="px-2 py-1 border rounded focus:outline-none"
             maxLength={120}
           />
-          <button
-            className="bg-slate-200 mt-2 hover:bg-rose-600 text-black py-2 px-4 rounded focus:outline-none"
-            onClick={() => handleSave(audioRecording, tag, user)}
-          >
-            Save
-          </button>
+     
+     <input
+  type="file"
+  onChange={handlePhotoChange}
+  accept="image/*" // Specify accepted file types (e.g., images)
+/>
+
+<button
+  className="bg-slate-200 mt-2 hover:bg-rose-600 text-black py-2 px-4 rounded focus:outline-none"
+  onClick={() => handleSave(audioRecording, tag, user)}
+>
+  Save
+</button>
         </div>
+        <div className="fixed bottom-10 right-10">
+        <button
+          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none"
+          onClick={handleFormToggle}
+        >
+          {formVisible ? 'Hide Form' : 'Show Form'}
+        </button>
+      </div>
       </div>
 
       {audioRecording && (
@@ -367,9 +418,9 @@ const Chat = () => {
     <div key={file.id} className="bg-whitesmoke space-y-2 border-t border-black space-x-3 p-1">
       <div className="flex justify-center">
         <button
-          className="bg-cover bg-center mt-2 shadow-slate-400 shadow-lg w-24 h-16 rounded-sm"
+          className=" bg-cover bg-center mt-2 shadow-slate-400 shadow-lg  w-full h-52 rounded-sm"
           style={{
-            backgroundImage: `url(${file.photoURL})`,
+            backgroundImage: `url(${file.image})`,
           }}
           onClick={() => handlePlayAudio(file.url, file)}
         ></button>

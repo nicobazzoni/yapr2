@@ -4,7 +4,8 @@ import { firestore, storage } from '../../firebase';
 import LikeButton from '../components/LikeButton';
 import { AuthContext } from '../contexts/AuthContext';
 import FollowerList from '../components/FollowerList';
-
+import axios from 'axios';
+import * as Tone from 'tone';
 
 const ProfilePage = () => {
   const { username } = useParams();
@@ -12,10 +13,29 @@ const ProfilePage = () => {
   const [uploads, setUploads] = useState([]);
   const [audioFiles, setAudioFiles] = useState([]);
   const [selectedProfilePhoto, setSelectedProfilePhoto] = useState(null);
+  const [synth] = useState(() => new Tone.Synth().toDestination());
 
   const { currentUser } = useContext(AuthContext);
 
-  const { userId } = useParams();
+
+  useEffect(() => {
+    const part = new Tone.Part((time, note) => {
+      synth.triggerAttackRelease(note, '8n', time);
+    }, []);
+
+    const playRandomNote = () => {
+      const frequency = Tone.Frequency(Math.random() * 500 + 200).toNote();
+      part.add('+1', frequency);
+    };
+
+    const intervalId = setInterval(playRandomNote, 1000);
+
+    return () => {
+      clearInterval(intervalId);
+      part.dispose();
+      synth.dispose();
+    };
+  }, []);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -39,7 +59,7 @@ const ProfilePage = () => {
       try {
         const userRef = firestore.collection('users').doc(userId);
         const userSnapshot = await userRef.get();
-  
+
         if (userSnapshot.exists) {
           const userData = userSnapshot.data();
           setUser({ id: userSnapshot.id, ...userData });
@@ -80,42 +100,33 @@ const ProfilePage = () => {
     };
 
     fetchUserData();
-    fetchUser(currentUser.uid, username)
-    console.log( 'cheers', currentUser.uid, username);
-  }, [username]);
+    fetchUser(currentUser.uid, username);
+  }, [username, currentUser]);
 
-  //change profile photo
+  useEffect(() => {
+    // Create a new Tone.js synth
+    const synth = new Tone.Synth().toDestination();
 
-  const handleProfilePhotoChange = (event) => {
-    setSelectedProfilePhoto(event.target.files[0]);
-  };
+    // Function to play a note
+    const playNote = (frequency) => {
+      synth.triggerAttackRelease(frequency, '8n');
+    };
+
+    // Play a random note every 1 second
+    const playRandomNote = () => {
+      const frequency = Tone.Frequency(Math.random() * 880 + 220, 'midi').toFrequency();
+      playNote(frequency);
+    };
+
+    const intervalId = setInterval(playRandomNote, 1000);
+
+    return () => {
+      // Clean up the interval when the component unmounts
+      clearInterval(intervalId);
+    };
+  }, []);
+
   
-
- 
-  
-
-  const uploadProfilePhoto = async () => {
-    if (selectedProfilePhoto) {
-      try {
-        const storageRef = firestore.storage().ref();
-        const fileRef = storageRef.child(`profile-photos/${user.username}`);
-        await fileRef.put(selectedProfilePhoto);
-        const photoURL = await fileRef.getDownloadURL();
-  
-        // Update the user's profile with the new photoURL
-        await firestore.collection('users').doc(user.id).update({
-          photoURL: photoURL,
-        });
-  
-        // Reset the selected profile photo state
-        setSelectedProfilePhoto(null);
-      } catch (error) {
-        console.error('Error uploading profile photo:', error);
-      }
-    }
-  };
-
- 
   
   
   
@@ -175,12 +186,16 @@ const ProfilePage = () => {
       <div className="mt-8">
         <h2 className="text-2xl font-bold mb-4">Audio Files</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
-          {audioFiles.map((audioFile) => (
-            <div key={audioFile.id} className="bg-slate-100 space-y-2 w-full border border-slate-200 rounded-md p-1">
-              <audio src={audioFile.url} controls className="w-full"></audio>
-              <p className="text-gray-600 bg-white text-center">{audioFile.tag}</p>
-            </div>
-          ))}
+          
+        {audioFiles.map((audioFile) => (
+  <div key={audioFile.id} className="bg-slate-100 space-y-2 w-full border border-slate-200 rounded-md p-1">
+    <audio src={audioFile.url} controls className="w-full"></audio>
+    <p className="text-gray-600 bg-white text-center">{audioFile.tag}</p>
+    <button onClick={() => processAudio(audioFile.url)}>Process Audio</button>
+
+  </div>
+))}
+
         </div>
       </div>
   </div>
