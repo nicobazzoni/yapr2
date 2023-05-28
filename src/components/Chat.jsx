@@ -267,6 +267,7 @@ const [formVisible, setFormVisible] = useState(false);
 
   const handlePlayAudio = (url, file) => {
     setAudioPlaying(true);
+    setIsPlaying(true);
   
     const { username, tag } = file;
     const audioPlayer = new Audio(url);
@@ -435,6 +436,16 @@ const [formVisible, setFormVisible] = useState(false);
           }}
           onClick={() => handlePlayAudio(file.url, file)}
         ></button>
+          <ReactAudioPlayer
+    key={file.id}
+    src={file.url}
+    autoPlay={false}
+    controls
+    onPlay={() => setIsPlaying(true)}
+    onPause={() => setIsPlaying(false)}
+    onEnded={() => setIsPlaying(false)}
+    onError={(e) => console.error('Error playing audio:', e)}
+  />
       </div>
       <div className="flex justify-between items-center bg-white">
         <p className="text-gray-600 text-xs bg-slate-50 hover:bg-rose-500 font-mono shadow-md rounded-full max-w-fit p-2">
@@ -470,6 +481,8 @@ const [formVisible, setFormVisible] = useState(false);
             {format(file.createdAt.toDate(), 'MM·dd·yy - h:mm a')}
           </p>
         )}
+
+
       </div>
 
 
