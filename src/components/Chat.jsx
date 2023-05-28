@@ -271,6 +271,7 @@ const [formVisible, setFormVisible] = useState(false);
     const { username, tag } = file;
     const audioPlayer = new Audio(url);
     audioPlayer.play();
+    audioPlayer.volume = 1;
   
     // Display a toast message
     toast(`Playing audio by ${username}. Tag: ${tag}`);
@@ -285,6 +286,7 @@ const [formVisible, setFormVisible] = useState(false);
   
     const audioPlayer = new Audio(url);
     audioPlayer.play();
+    audioPlayer.volume = 1;
   
     // Display a toast message with the reply user data
     toast(`Playing audio by ${Myusername}. Tag: ${Mytag}`);
@@ -388,28 +390,29 @@ const [formVisible, setFormVisible] = useState(false);
             Listen
           </button>
         </div>
-        <div className="flex flex-col md:flex-row lg:flex-row md:space-x-3 lg:space-x-4 items-center">
+        <div className="flex mb-1 flex-col md:flex-row lg:flex-row md:space-x-3 lg:space-x-4 items-center">
           <input
             type="text"
             value={tag}
             onChange={(e) => setTag(e.target.value)}
-            placeholder="tag (max 120 characters)"
-            className="px-2 py-1 border rounded focus:outline-none"
+            placeholder="write here..."
+            className="px-3 py-1 border mb-2 rounded focus:outline-none"
             maxLength={120}
           />
      
-     <input
-  type="file"
-  onChange={handlePhotoChange}
-  accept="image/*" // Specify accepted file types (e.g., images)
-/>
+          <input
+        className="bg-blue-500 hover:bg-blue-600 w-72 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        type="file"
+        onChange={handlePhotoChange}
+        accept="image/*"
+      />
 
-<button
-  className="bg-slate-200 mt-2 hover:bg-rose-600 text-black py-2 px-4 rounded focus:outline-none"
-  onClick={() => handleSave(audioRecording, tag, user)}
->
-  Save
-</button>
+        <button
+          className="bg-slate-200 mt-2 hover:bg-rose-600 text-black py-2 px-4 rounded focus:outline-none"
+          onClick={() => handleSave(audioRecording, tag, user)}
+        >
+          Save
+        </button>
         </div>
       
       </div>
@@ -426,7 +429,7 @@ const [formVisible, setFormVisible] = useState(false);
     <div key={file.id} className="bg-whitesmoke space-y-2 border-t border-black space-x-3 p-1">
       <div className="flex justify-center">
         <button
-          className=" bg-contain  bg-center mt-2 shadow-slate-400 shadow-lg  w-full h-52 rounded-sm"
+          className=" bg-cover bg-center mt-2 shadow-slate-400 shadow-lg  w-full h-72 rounded-sm"
           style={{
             backgroundImage: `url(${file.image})`,
           }}
