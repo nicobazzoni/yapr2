@@ -273,6 +273,11 @@ const [formVisible, setFormVisible] = useState(false);
     const audioPlayer = new Audio(url);
     audioPlayer.play();
     audioPlayer.volume = 1;
+
+    //overwrite ios to use speaker instead of earpiece
+    audioPlayer.setSinkId('default');
+
+    
   
     // Display a toast message
     toast(`Playing audio by ${username}. Tag: ${tag}`);
