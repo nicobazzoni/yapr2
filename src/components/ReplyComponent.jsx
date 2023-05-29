@@ -5,6 +5,7 @@ import { AuthContext } from '../contexts/AuthContext';
 import firebase from 'firebase/compat/app';
 import { v4 as uuid } from 'uuid';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const ReplyComponent = ({ recordingId,  }) => {
   const [audioRecording, setAudioRecording] = useState(null);
@@ -18,6 +19,7 @@ const ReplyComponent = ({ recordingId,  }) => {
   const [replyPlay, setReplyPlay] = useState(false);
 
   const { currentUser } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -132,6 +134,7 @@ const ReplyComponent = ({ recordingId,  }) => {
     } else {
       console.log('Missing user, audio recording, or tag');
     }
+    navigate("/voicecall")
   };
   const fetchReplies = async (audioFileId) => {
     try {

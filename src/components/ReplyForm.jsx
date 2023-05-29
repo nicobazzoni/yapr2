@@ -88,7 +88,7 @@ const ReplyForm = ({ itemId,}) => {
     } catch (error) {
       console.error('Error saving reply:', error);
     }
-    navigate('/home');
+   
   };
 
   useEffect(() => {
