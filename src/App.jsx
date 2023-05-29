@@ -42,7 +42,7 @@ function App() {
               <Route path="/username" element={<UsernamePage />} />
               <Route path="/details/:itemId" element={<DetailsPage />} />
               <Route path="/profile/:username" element={<ProfilePage />} />
-              <Route path="/voicecall" element={<Room />} />
+              <Route path="/voicecall" element={<Room user={user}  />} />
               <Route path= "/images"  element={<Images/>} />
               <Route path="*" element={<h1>Not Found</h1>} />
             </Routes>

@@ -121,9 +121,11 @@ const ReplyComponent = ({ recordingId,  }) => {
         // Show toast message here
         toast.success('Reply saved successfully!');
 
-        window.location.reload();
+       
         // Refresh data
         fetchReplies(); 
+
+        navigate("/voicecall")
 
         
         // Replace fetchData with your actual function to fetch the data
@@ -134,7 +136,7 @@ const ReplyComponent = ({ recordingId,  }) => {
     } else {
       console.log('Missing user, audio recording, or tag');
     }
-    navigate("/voicecall")
+  
   };
   const fetchReplies = async (audioFileId) => {
     try {
@@ -150,6 +152,7 @@ const ReplyComponent = ({ recordingId,  }) => {
       }));
 
       return repliesData;
+
     } catch (error) {
       console.error('Error fetching replies:', error);
       return [];
