@@ -437,13 +437,21 @@ const [formVisible, setFormVisible] = useState(false);
 
 
   {audioFiles.map((file) => (
-    <div key={file.id} className="bg-white space-y-2 border-t border-black p-1">
+   <div key={file.id} className="bg-white space-y-2 border-black border-t-4 mt-8 p-1">
+
     <div className='flex justify-between items-center bg-stone-50 p-2'>
   <img src={file.photoURL} alt={file.username} className="w-10 h-10 shadow-md border border-slate-300 rounded-full mt-2 ml-2" />
+  {file.createdAt && (
+          <p style={{ fontSize: '10px' }} className="text-gray-600  font-mono">
+            {format(file.createdAt.toDate(), 'MM·dd·yy - h:mm a')}
+          </p>
+        )}
   <a href={`/profile/${file.username}`} className="text-gray-600 text-xs bg-slate-50 hover:bg-rose-500 font-mono shadow-md rounded-full max-w-fit p-2">
     {file.username}
   </a>
+
 </div>
+<div className={  audioPlaying ? 'animation-ping 1s  ' : ''}>{file.tag}</div>
       <div className="flex justify-center ">
         <button
           className=" bg-cover mb-3 bg-center mt-2 shadow-slate-400 shadow-lg  w-full h-72 rounded-sm"
@@ -470,12 +478,8 @@ const [formVisible, setFormVisible] = useState(false);
 
   onClick={() => handlePlayAudio(file.url, file)}
 >
-        <div className={audioPlaying ? 'animation-ping 1s  ' : ''}>{file.tag}</div>
-        {file.createdAt && (
-          <p style={{ fontSize: '10px' }} className="text-gray-600 font-mono">
-            {format(file.createdAt.toDate(), 'MM·dd·yy - h:mm a')}
-          </p>
-        )}
+        
+       
 
         
       </div>
@@ -502,18 +506,18 @@ const [formVisible, setFormVisible] = useState(false);
                 />
               )}
 
-              <h1 className="font-mono text-xs text-indigo-200 text-bold">Replies</h1>
-              <div className=''>
+              <h1 className="font-mono text-xs text-stone-500 border-t   text-bold">Replies</h1>
+              <div className='border-b-4 border-b-rose-200 '>
   {file.replies &&
     file.replies.map((reply) => (
       <div
         key={reply.id}
-        className="mt-4 relative bg-slate-50 p-4 rounded-md shadow-md hover:bg-yellow-200 cursor-pointer"
+        className="mt-4 relative bg-slate-50 p-4  rounded-md shadow-md hover:bg-yellow-200 cursor-pointer"
         onClick={() => handlePlayReply(reply.url, file, reply)}
       >
-        <div className="relative">
+        <div className="relative ">
           <div
-            className="bg-cover bg-center mt-2 shadow-slate-400 shadow-lg w-10 h-10 rounded-full"
+            className="bg-cover bg-center mt-2 shadow-slate-400  shadow-lg w-10 h-10 rounded-full"
             style={{ backgroundImage: `url(${reply.photo})` }}
           ></div>
           <div className="absolute inset-0 flex items-center justify-center">

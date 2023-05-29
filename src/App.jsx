@@ -34,6 +34,7 @@ function App() {
             <Header user={user} />
           </div>
           <div className="container mx-auto overflow-x-hidden">
+         
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/signup" element={<SignUp />} />
