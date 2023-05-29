@@ -9,7 +9,7 @@ const ReplyForm = ({ itemId,}) => {
   const [user, setUser] = useState(null);
   const [replies, setReplies] = useState([]);
 
-  const navigate = useNavigate();
+
 
   useEffect(() => {
     if (currentUser) {

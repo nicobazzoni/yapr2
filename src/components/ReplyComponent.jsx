@@ -93,48 +93,51 @@ const ReplyComponent = ({ recordingId, handleReplyButtonClick, fetchReplies }) =
   };
 
   const handleSave = async () => {
-  if (user && user.username && audioRecording && tag) {
-    const filename = `${uuid()}.m4a`;
-    const username = user.username;
-    const photo = user.photoURL || '';
-    const uid = currentUser.uid;
-
-    try {
-      const audioFileRef = storageRef.child(`audio/${username}/${filename}`);
-      await audioFileRef.put(audioRecording.blob, { contentType: 'audio/mp4' });
-      const audioFileUrl = await audioFileRef.getDownloadURL();
-
-      const replyDoc = db.collection('audioReplies').doc();
-      const replyId = replyDoc.id;
-      await replyDoc.set({
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        username: username,
-        uid: uid,
-        tag: tag,
-        url: audioFileUrl,
-        parentPostId: recordingId,
-        isReply: true,
-        photo: photo,
-      });
-
-      toast.success('Reply saved successfully!');
-      setTag('');
-      handleReplyButtonClick('');
-
-      // Fetch the updated replies for the parent post using fetchReplies and recordingId
-      const updatedReplies = await fetchReplies(recordingId);
-      // Handle the updated replies as needed
-
-      // Additional actions or logic after saving the reply
-    } catch (error) {
-      console.error('Error saving audio file:', error);
-      toast.error('Error saving audio file');
+    if (user && user.username && audioRecording && tag) {
+      const filename = `${uuid()}.m4a`;
+      const username = user.username;
+      const photo = user.photoURL || '';
+      const uid = currentUser.uid;
+  
+      try {
+        const audioFileRef = storageRef.child(`audio/${username}/${filename}`);
+        await audioFileRef.put(audioRecording.blob, { contentType: 'audio/mp4' });
+        const audioFileUrl = await audioFileRef.getDownloadURL();
+  
+        const replyDoc = db.collection('audioReplies').doc();
+        const replyId = replyDoc.id;
+        await replyDoc.set({
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          username: username,
+          uid: uid,
+          tag: tag,
+          url: audioFileUrl,
+          parentPostId: recordingId,
+          isReply: true,
+          photo: photo,
+        });
+  
+        toast.success('Reply saved successfully!');
+        setTag('');
+        handleReplyButtonClick('');
+  
+        // Fetch the updated replies for the parent post using fetchReplies and recordingId
+        const updatedReplies = await fetchReplies(recordingId);
+        // Handle the updated replies as needed
+  
+        // Additional actions or logic after saving the reply
+      } catch (error) {
+        console.error('Error saving audio file:', error);
+        toast.error('Error saving audio file');
+      }
+    } else {
+      console.log('Missing user, audio recording, or tag');
     }
-  } else {
-    console.log('Missing user, audio recording, or tag');
-  }
-};
-
+  };
+  
+  
+  
+  
 
 return (
   <div className="flex flex-col items-center mt-8">

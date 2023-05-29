@@ -28,10 +28,10 @@ const Chat = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-const [imageURL, setImageURL] = useState('');
-const [selectedPhoto, setSelectedPhoto] = useState(null);
-const [formVisible, setFormVisible] = useState(false); 
-  
+  const [imageURL, setImageURL] = useState('');
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [formVisible, setFormVisible] = useState(false); 
+
 
   const { currentUser } = useContext(AuthContext);
 
@@ -148,18 +148,7 @@ const [formVisible, setFormVisible] = useState(false);
     setReplyRecordingId(recordingId);
   };
 
-  const uploadImage = async () => {
-    if (selectedImage) {
-      try {
-        const storageRef = storageRef.child(`images/${selectedImage.name}`);
-        await storageRef.put(selectedImage);
-        const imageURL = await storageRef.getDownloadURL();
-        setImageURL(imageURL);
-      } catch (error) {
-        console.error('Error uploading image:', error);
-      }
-    }
-  };
+
 
   const handleSave = async (recording, tag, user) => {
     if (user && user.username && user.photoURL && recording && tag && selectedImage) {
@@ -301,25 +290,30 @@ const [formVisible, setFormVisible] = useState(false);
   
 
 
-  const handleDelete = (id, username) => {
+  const handleDelete = async (id, username) => {
     if (user && user.username === username) {
-      firestore
-        .collection('audioFiles')
-        .doc(id)
-        .delete()
-        .then(() => {
-          console.log('Document successfully deleted!');
-          // show a success message
-        })
-        .catch((error) => {
-          console.error('Error removing document: ', error);
-          // handle the error
-        });
+      try {
+        await firestore.collection('audioFiles').doc(id).delete();
+        console.log('Document successfully deleted!');
+  
+        // Filter out the deleted audio file from audioFiles state
+        const updatedAudioFiles = audioFiles.filter((file) => file.id !== id);
+        setAudioFiles(updatedAudioFiles);
+  
+        // Filter out the replies associated with the deleted audio file from replies state
+        const updatedReplies = replies.filter((reply) => reply.parentPostId !== id);
+        setReplies(updatedReplies);
+      } catch (error) {
+        console.error('Error removing document: ', error);
+        // Handle the error
+      }
     } else {
       console.log('You are not authorized to delete this document.');
-      // handle the error
+      // Handle the error
     }
   };
+  
+  
 
   const handleReplyDelete = async (id, username) => {
     if (user && user.username === username) {
@@ -502,7 +496,7 @@ const [formVisible, setFormVisible] = useState(false);
                   recordingId={replyRecordingId}
                   handleReplyButtonClick={handleReplyButtonClick}
                   fetchReplies={fetchReplies}
-                
+                  audioFiles={audioFiles}
                 />
               )}
 
