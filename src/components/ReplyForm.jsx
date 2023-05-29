@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { firestore } from '../../firebase';
 import { AuthContext } from '../contexts/AuthContext';
+import { Navigate } from 'react-router-dom';
 
 const ReplyForm = ({ itemId,}) => {
   const [replyContent, setReplyContent] = useState('');
   const { currentUser } = useContext(AuthContext);
   const [user, setUser] = useState(null);
   const [replies, setReplies] = useState([]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (currentUser) {
@@ -85,6 +88,7 @@ const ReplyForm = ({ itemId,}) => {
     } catch (error) {
       console.error('Error saving reply:', error);
     }
+    navigate('/home');
   };
 
   useEffect(() => {
