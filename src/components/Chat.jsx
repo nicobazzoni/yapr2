@@ -431,26 +431,33 @@ const [formVisible, setFormVisible] = useState(false);
       )}
        
       <div className="container mx-auto mt-8">
-        <h2 className="text-2xl text-blue-200 p-1 font-mono font-bold mb-1">Yaps:</h2>
+        <h2 className="text-2xl text-blue-200 p-1 font-mono font-bold mb-1">yaps</h2>
 
-        <div className="space-y-4">
+        <div className="">
 
 
   {audioFiles.map((file) => (
-    <div key={file.id} className="bg-whitesmoke space-y-2 border-t border-black p-1">
-      <div className="flex justify-center">
+    <div key={file.id} className="bg-white space-y-2 border-t border-black p-1">
+    <div className='flex justify-between items-center bg-stone-50 p-2'>
+  <img src={file.photoURL} alt={file.username} className="w-10 h-10 shadow-md border border-slate-300 rounded-full mt-2 ml-2" />
+  <a href={`/profile/${file.username}`} className="text-gray-600 text-xs bg-slate-50 hover:bg-rose-500 font-mono shadow-md rounded-full max-w-fit p-2">
+    {file.username}
+  </a>
+</div>
+      <div className="flex justify-center ">
         <button
-          className=" bg-cover bg-center mt-2 shadow-slate-400 shadow-lg  w-full h-72 rounded-sm"
+          className=" bg-cover mb-3 bg-center mt-2 shadow-slate-400 shadow-lg  w-full h-72 rounded-sm"
           style={{
             backgroundImage: `url(${file.image})`,
           }}
           onClick={() => handlePlayAudio(file.url, file)}
-        ></button>
+        >
+
+        </button>
       </div>
-      <div className="flex justify-between items-center bg-white">
-        <p className="text-gray-600 text-xs bg-slate-50 hover:bg-rose-500 font-mono shadow-md rounded-full max-w-fit p-2">
-          {file.username}
-        </p>
+      <div className="flex justify-between  items-center bg-white">
+
+        
         {user && user.username === file.username && (
           <MdDelete
             className="bg-red-500 hover:bg-red-600 text-white py-1 px-2 text-xs rounded focus:outline-none mt-2 -translate-y-4 translate-x-1"
@@ -491,11 +498,12 @@ const [formVisible, setFormVisible] = useState(false);
                   recordingId={replyRecordingId}
                   handleReplyButtonClick={handleReplyButtonClick}
                   fetchReplies={fetchReplies}
+                
                 />
               )}
 
               <h1 className="font-mono text-xs text-indigo-200 text-bold">Replies</h1>
-              <div>
+              <div className=''>
   {file.replies &&
     file.replies.map((reply) => (
       <div

@@ -7,16 +7,14 @@ import { v4 as uuid } from 'uuid';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
-const ReplyComponent = ({ recordingId,  }) => {
+const ReplyComponent = ({ recordingId, handleReplyButtonClick, fetchReplies }) => {
   const [audioRecording, setAudioRecording] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioPlayerRef = useRef(null);
   const [tag, setTag] = useState('');
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const replyId = uuid()
-  const [replyPlay, setReplyPlay] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -50,10 +48,15 @@ const ReplyComponent = ({ recordingId,  }) => {
     }
   };
 
+  const handlePhotoChange = (e) => {
+    if (e.target.files[0]) {
+      setSelectedImage(e.target.files[0]);
+    }
+  };
+
+
   const handleStartRecording = () => {
-   
     setIsRecording(true);
-    setReplyPlay(true);
 
     navigator.mediaDevices
       .getUserMedia({ audio: true })
@@ -68,7 +71,7 @@ const ReplyComponent = ({ recordingId,  }) => {
 
         mediaRecorder.addEventListener('stop', () => {
           const blob = new Blob(chunks, { type: 'audio/wav' });
-          setAudioRecording({ id: replyId, blob });
+          setAudioRecording({ id: recordingId, blob });
           audioPlayerRef.current.src = URL.createObjectURL(blob);
           audioPlayerRef.current.play();
         });
@@ -82,7 +85,6 @@ const ReplyComponent = ({ recordingId,  }) => {
 
   const handleStopRecording = () => {
     setIsRecording(false);
-    setReplyPlay(false);
 
     const mediaRecorder = mediaRecorderRef.current;
     if (mediaRecorder && mediaRecorder.state === 'recording') {
@@ -91,93 +93,63 @@ const ReplyComponent = ({ recordingId,  }) => {
   };
 
   const handleSave = async () => {
-    if (user && user.username && audioRecording && tag) {
-      const filename = `${replyId}.wav`;
-      const username = user.username;
-      const photo = user.photoURL || '';
-      const uid = currentUser.uid;
-  
-      try {
-        const audioFileRef = storageRef.child(`audio/${username}/${filename}`);
-        await audioFileRef.put(audioRecording.blob);
-  
-        const audioFileUrl = await audioFileRef.getDownloadURL();
-  
-        const replyDoc = db.collection('audioReplies').doc(replyId);
-        await replyDoc.set({
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          username: username,
-          uid: uid,
-          tag: tag,
-          url: audioFileUrl,
-          parentPostId: recordingId,
-          isReply: true,
-          photo: photo,
-        });
-  
-        console.log('Audio reply saved:', replyId);
-        setTag('');
-  
-        // Show toast message here
-        toast.success('Reply saved successfully!');
-  
-        // Fetch the replies again to get the updated data
-        const updatedReplies = await fetchReplies(recordingId);
-        // Update the replies state with the updated data
-        setReplies(updatedReplies);
-  
-        // Navigate to the voicecall page
-        navigate('/voicecall');
-      } catch (error) {
-        console.error('Error saving audio file:', error);
-        toast.error('Error saving audio file');
-      }
-    } else {
-      console.log('Missing user, audio recording, or tag');
-    }
-  };
-  
-  const fetchReplies = async (audioFileId) => {
+  if (user && user.username && audioRecording && tag) {
+    const filename = `${uuid()}.m4a`;
+    const username = user.username;
+    const photo = user.photoURL || '';
+    const uid = currentUser.uid;
+
     try {
-      const repliesSnapshot = await firestore
-        .collection('audioReplies')
-        .where('parentPostId', '==', audioFileId)
-        .orderBy('createdAt', 'asc')
-        .get();
+      const audioFileRef = storageRef.child(`audio/${username}/${filename}`);
+      await audioFileRef.put(audioRecording.blob, { contentType: 'audio/mp4' });
+      const audioFileUrl = await audioFileRef.getDownloadURL();
 
-      const repliesData = repliesSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const replyDoc = db.collection('audioReplies').doc();
+      const replyId = replyDoc.id;
+      await replyDoc.set({
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        username: username,
+        uid: uid,
+        tag: tag,
+        url: audioFileUrl,
+        parentPostId: recordingId,
+        isReply: true,
+        photo: photo,
+      });
 
-      return repliesData;
+      toast.success('Reply saved successfully!');
+      setTag('');
+      handleReplyButtonClick('');
 
+      // Fetch the updated replies for the parent post using fetchReplies and recordingId
+      const updatedReplies = await fetchReplies(recordingId);
+      // Handle the updated replies as needed
+
+      // Additional actions or logic after saving the reply
     } catch (error) {
-      console.error('Error fetching replies:', error);
-      return [];
+      console.error('Error saving audio file:', error);
+      toast.error('Error saving audio file');
     }
-  };
-  
-  
+  } else {
+    console.log('Missing user, audio recording, or tag');
+  }
+};
+
 
   return (
     <div className="flex flex-col items-center mt-8">
       <h2 className="text-2xl font-bold mb-4">Reply</h2>
       <div className="flex space-x-4">
         <button
-            className={`bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none ${replyPlay ? 'animate-pulse' : ''}`}
-          onClick={handleStartRecording}
+          className={`bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none ${
+            isRecording ? 'animate-pulse' : ''
+          }`}
+          onClick={isRecording ? handleStopRecording : handleStartRecording}
         >
-          Talk
-        </button>
-        <button
-          className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded focus:outline-none"
-          onClick={handleStopRecording}
-        >
-          Stop
+          {isRecording ? 'Stop' : 'Talk'}
         </button>
       </div>
-      <audio ref={audioPlayerRef} autoPlay  />
+      <audio ref={audioPlayerRef} autoPlay />
       <div className="flex items-center">
         <input
           type="text"
@@ -187,6 +159,7 @@ const ReplyComponent = ({ recordingId,  }) => {
           className="px-2 py-1 border rounded focus:outline-none"
           maxLength={10}
         />
+        <input type="file" onChange={handlePhotoChange} accept="image/*" />
         <button
           className="bg-yellow-300 hover:bg-rose-600 text-white py-2 px-4 rounded focus:outline-none"
           onClick={handleSave}
