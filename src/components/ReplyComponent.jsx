@@ -120,15 +120,14 @@ const ReplyComponent = ({ recordingId,  }) => {
   
         // Show toast message here
         toast.success('Reply saved successfully!');
-
-       
-        // Refresh data
-        fetchReplies(); 
-
-        navigate("/voicecall")
-
-        
-        // Replace fetchData with your actual function to fetch the data
+  
+        // Fetch the replies again to get the updated data
+        const updatedReplies = await fetchReplies(recordingId);
+        // Update the replies state with the updated data
+        setReplies(updatedReplies);
+  
+        // Navigate to the voicecall page
+        navigate('/voicecall');
       } catch (error) {
         console.error('Error saving audio file:', error);
         toast.error('Error saving audio file');
@@ -136,8 +135,8 @@ const ReplyComponent = ({ recordingId,  }) => {
     } else {
       console.log('Missing user, audio recording, or tag');
     }
-  
   };
+  
   const fetchReplies = async (audioFileId) => {
     try {
       const repliesSnapshot = await firestore
