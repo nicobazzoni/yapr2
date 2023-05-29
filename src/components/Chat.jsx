@@ -11,6 +11,7 @@ import RandomImageGenerator from './RandomImageGenerator';
 import axios from 'axios';
 import yicon from '../assets/yicon.jpg';
 import { toast } from 'react-toastify';
+import './styles.css';
 
 const Chat = () => {
   const [audioRecording, setAudioRecording] = useState(null);
@@ -273,11 +274,6 @@ const [formVisible, setFormVisible] = useState(false);
     const audioPlayer = new Audio(url);
     audioPlayer.play();
     audioPlayer.volume = 1;
-
-    //overwrite ios to use speaker instead of earpiece
-    audioPlayer.setSinkId('default');
-
-    
   
     // Display a toast message
     toast(`Playing audio by ${username}. Tag: ${tag}`);
@@ -285,6 +281,7 @@ const [formVisible, setFormVisible] = useState(false);
 
   const handlePlayReply = (url, file, reply) => {
     setAudioPlaying(true);
+    setIsPlaying(true);
   
     const { username, tag } = reply;
     const Myusername = reply.username;
@@ -294,10 +291,12 @@ const [formVisible, setFormVisible] = useState(false);
     audioPlayer.play();
     audioPlayer.volume = 1;
   
-    // Display a toast message with the reply user data
+    // Display a toast message with the reply and file data
     toast(`Playing audio by ${Myusername}. Tag: ${Mytag}`);
-  };
   
+    // You can also use the file data for other purposes within this function if needed
+    console.log('File:', file);
+  };
  
   
 
@@ -372,6 +371,8 @@ const [formVisible, setFormVisible] = useState(false);
     <div className="mt-8">
       <img src={yicon} className="w-12 h-12 border  rounded-full mx-auto" />
       <h2 className="text-sm bg-yellow-300 flex max-w-fit font-bold p-1 font-mono tracking-widest mb-4">voice</h2>
+
+      {/* FORM */}
       {currentUser && user && user.username && user.photo && (
         <h3 className="text-lg font-semibold mb-2">Logged in as:{user && user.username}</h3>
       )}
@@ -423,16 +424,20 @@ const [formVisible, setFormVisible] = useState(false);
       
       </div>
 
+
+{/* yaps */}
       {audioRecording && (
         <audio ref={audioPlayerRef} src={URL.createObjectURL(audioRecording.blob)} />
       )}
-
+       
       <div className="container mx-auto mt-8">
         <h2 className="text-2xl text-blue-200 p-1 font-mono font-bold mb-1">Yaps:</h2>
 
         <div className="space-y-4">
+
+
   {audioFiles.map((file) => (
-    <div key={file.id} className="bg-whitesmoke space-y-2 border-t border-black space-x-3 p-1">
+    <div key={file.id} className="bg-whitesmoke space-y-2 border-t border-black p-1">
       <div className="flex justify-center">
         <button
           className=" bg-cover bg-center mt-2 shadow-slate-400 shadow-lg  w-full h-72 rounded-sm"
@@ -441,16 +446,6 @@ const [formVisible, setFormVisible] = useState(false);
           }}
           onClick={() => handlePlayAudio(file.url, file)}
         ></button>
-          <ReactAudioPlayer
-    key={file.id}
-    src={file.url}
-    autoPlay={false}
-    controls
-    onPlay={() => setIsPlaying(true)}
-    onPause={() => setIsPlaying(false)}
-    onEnded={() => setIsPlaying(false)}
-    onError={(e) => console.error('Error playing audio:', e)}
-  />
       </div>
       <div className="flex justify-between items-center bg-white">
         <p className="text-gray-600 text-xs bg-slate-50 hover:bg-rose-500 font-mono shadow-md rounded-full max-w-fit p-2">
@@ -464,34 +459,22 @@ const [formVisible, setFormVisible] = useState(false);
         )}
       </div>
       <div
-        className={`w-full bg-gray-100 p-4 rounded-md hover:bg-slate-500 shadow-sm outline-none cursor-pointer 
-        ${
-          audioPlaying ? 'animation-pulse bg-blue-100' : ''
-        }`}
-        style={{
-          width: '100%',
-          borderRadius: '8px',
-          padding: '4px',
-          backgroundColor: '#ffffff',
-          boxShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
-          
-          
-             
-        }}
-        onClick={() => handlePlayAudio(file.url, file)}
-      >
-        <div>{file.tag}</div>
+  className={`w-full bg-gray-100 p-2 rounded-md shadow-md mb-3 outline-none hover:bg-lime-400 cursor-pointer `}
+
+  onClick={() => handlePlayAudio(file.url, file)}
+>
+        <div className={audioPlaying ? 'animation-ping 1s  ' : ''}>{file.tag}</div>
         {file.createdAt && (
           <p style={{ fontSize: '10px' }} className="text-gray-600 font-mono">
             {format(file.createdAt.toDate(), 'MM·dd·yy - h:mm a')}
           </p>
         )}
 
-
+        
       </div>
 
 
-
+ 
 
 
               {/* Reply component */}
@@ -527,7 +510,8 @@ const [formVisible, setFormVisible] = useState(false);
           ></div>
           <div className="absolute inset-0 flex items-center justify-center">
             {reply.tag && (
-              <div className="bg-white text-gray-800 hover:bg-blue-400 py-1 px-2 rounded">{reply.tag}</div>
+              <div className="bg-white text-gray-800 hover:bg-blue-400 py-1 px-2 rounded">
+                {reply.tag}</div>
             )}
           </div>
         </div>
