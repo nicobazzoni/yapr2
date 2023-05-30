@@ -129,22 +129,10 @@ const playKick= () => {
     }
   };
 
-  const handlePlayback = () => {
+   const handlePlayback = () => {
     const audioPlayer = audioPlayerRef.current;
-  
     if (audioPlayer) {
-      const playPromise = audioPlayer.play();
-  
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            // Audio playback started successfully
-          })
-          .catch((error) => {
-            // Error occurred while starting audio playback
-            console.error('Error playing audio:', error);
-          });
-      }
+      audioPlayer.play();
     }
   };
   
@@ -152,6 +140,7 @@ const playKick= () => {
   const handleReplyButtonClick = (recordingId) => {
     setShowReply(true);
     setReplyRecordingId(recordingId);
+  
   };
 
 
@@ -260,6 +249,7 @@ const playKick= () => {
     fetchAudioFilesAndReplies();
   }, []);
   
+  
 
   const handlePlayAudio = (url, file) => {
     setAudioPlaying(true);
@@ -271,6 +261,7 @@ const playKick= () => {
     audioPlayer.play();
     audioPlayer.volume = 1;
     audioPlayer.ignoreMobileRestrictions = true;
+    
   
     // Display a toast message
     toast(`Playing audio by ${username}. Tag: ${tag}`);
@@ -395,6 +386,7 @@ const playKick= () => {
             Stop
           </button>
           <button
+          
             className="bg-black hover:bg-green-600 text-white py-2 px-4 rounded focus:outline-none"
             onClick={handlePlayback}
           >

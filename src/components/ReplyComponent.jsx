@@ -15,6 +15,7 @@ const ReplyComponent = ({ recordingId, handleReplyButtonClick, fetchReplies }) =
   const [tag, setTag] = useState('');
   const [user, setUser] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [replies, setReplies] = useState([]);
 
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -120,10 +121,13 @@ const ReplyComponent = ({ recordingId, handleReplyButtonClick, fetchReplies }) =
         toast.success('Reply saved successfully!');
         setTag('');
         handleReplyButtonClick('');
+        window.location.reload();
   
         // Fetch the updated replies for the parent post using fetchReplies and recordingId
         const updatedReplies = await fetchReplies(recordingId);
-        // Handle the updated replies as needed
+  
+        // Update the replies state with the updated replies
+        setReplies(updatedReplies);
   
         // Additional actions or logic after saving the reply
       } catch (error) {
@@ -134,6 +138,7 @@ const ReplyComponent = ({ recordingId, handleReplyButtonClick, fetchReplies }) =
       console.log('Missing user, audio recording, or tag');
     }
   };
+  
   
   
   
