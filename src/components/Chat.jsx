@@ -12,6 +12,7 @@ import axios from 'axios';
 import yicon from '../assets/yicon.jpg';
 import { toast } from 'react-toastify';
 import './styles.css';
+import kick from '../assets/kick.wav';
 
 const Chat = () => {
   const [audioRecording, setAudioRecording] = useState(null);
@@ -28,12 +29,17 @@ const Chat = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [imageURL, setImageURL] = useState('');
-  const [selectedPhoto, setSelectedPhoto] = useState(null);
+
   const [formVisible, setFormVisible] = useState(false); 
 
+const { currentUser } = useContext(AuthContext);
 
-  const { currentUser } = useContext(AuthContext);
+
+
+const playKick= () => {
+  const audio = new Audio(kick);
+  audio.play();
+};
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -367,7 +373,9 @@ const Chat = () => {
     <div className="mt-8">
       <img src={yicon} className="w-12 h-12 border  rounded-full mx-auto" />
       <h2 className="text-sm bg-yellow-300 flex max-w-fit font-bold p-1 font-mono tracking-widest mb-4">voice</h2>
-
+      <button onClick={playKick} className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none">
+      Test Sound
+    </button>
       {/* FORM */}
       {currentUser && user && user.username && user.photo && (
         <h3 className="text-lg font-semibold mb-2">Logged in as:{user && user.username}</h3>
