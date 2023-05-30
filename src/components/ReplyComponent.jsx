@@ -162,12 +162,7 @@ return (
         className="px-2 py-1 border rounded focus:outline-none"
         maxLength={50}
       />
-      <label className="ml-4">
-        <input type="file" onChange={handlePhotoChange} accept="image/*" className="hidden" />
-        <span className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded cursor-pointer">
-          Upload Image
-        </span>
-      </label>
+     
       <button
         className="bg-yellow-300 hover:bg-rose-600 text-white py-2 px-4 rounded focus:outline-none"
         onClick={handleSave}

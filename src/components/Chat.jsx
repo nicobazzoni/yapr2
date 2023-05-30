@@ -258,11 +258,13 @@ const Chat = () => {
   const handlePlayAudio = (url, file) => {
     setAudioPlaying(true);
     setIsPlaying(true);
+    
   
     const { username, tag } = file;
     const audioPlayer = new Audio(url);
     audioPlayer.play();
     audioPlayer.volume = 1;
+    audioPlayer.ignoreMobileRestrictions = true;
   
     // Display a toast message
     toast(`Playing audio by ${username}. Tag: ${tag}`);
@@ -279,7 +281,7 @@ const Chat = () => {
     const audioPlayer = new Audio(url);
     audioPlayer.play();
     audioPlayer.volume = 1;
-  
+    audioPlayer.ignoreMobileRestrictions = true;
     // Display a toast message with the reply and file data
     toast(`Playing audio by ${Myusername}. Tag: ${Mytag}`);
   
@@ -468,10 +470,11 @@ const Chat = () => {
         )}
       </div>
       <div
-  className={`w-full bg-gray-100 p-2 rounded-md shadow-md mb-3 outline-none hover:bg-lime-400 cursor-pointer `}
+  className={`w-full bg-gray-100 p-2 rounded-md shadow-md mb-3 outline-none hover:bg-blue-200 cursor-pointer `}
 
   onClick={() => handlePlayAudio(file.url, file)}
 >
+  <h1 className="text-xs font-bold text-stone-500 font-mono">Listen</h1>
         
        
 
