@@ -4,6 +4,7 @@ import { firestore } from '../../firebase';
 import LikeButton from '../components/LikeButton';
 import BioForm from '../components/BioForm';
 import { AuthContext } from '../contexts/AuthContext';
+import { toast } from 'react-toastify';
 
 const ProfilePage = () => {
   const { username } = useParams();
@@ -15,64 +16,54 @@ const ProfilePage = () => {
 
   const { currentUser } = useContext(AuthContext);
 
- 
+  const fetchUserData = async () => {
+    try {
+      const userRef = firestore.collection('users').where('username', '==', username);
+      const userSnapshot = await userRef.get();
 
+      if (!userSnapshot.empty) {
+        const userData = userSnapshot.docs[0].data();
+        setUser(userData);
+        console.log('profile', userData);
+        const uid = userSnapshot.docs[0].id;
+        await Promise.all([fetchUploads(uid), fetchAudioFiles(uid)]);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
 
+  const fetchUploads = async (uid) => {
+    try {
+      const uploadsRef = firestore.collection('uploads').where('uid', '==', uid);
+      const uploadsSnapshot = await uploadsRef.get();
 
+      const userUploads = uploadsSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setUploads(userUploads);
+    } catch (error) {
+      console.error('Error fetching user uploads:', error);
+    }
+  };
 
+  const fetchAudioFiles = async (uid) => {
+    try {
+      const audioFilesRef = firestore.collection('audioFiles').where('uid', '==', uid);
+      const audioFilesSnapshot = await audioFilesRef.get();
 
+      const userAudioFiles = audioFilesSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setAudioFiles(userAudioFiles);
+    } catch (error) {
+      console.error('Error fetching user audio files:', error);
+    }
+  };
 
   useEffect(() => {
-   
-   
-   
-    const fetchUserData = async () => {
-      try {
-        const userRef = firestore.collection('users').where('username', '==', username);
-        const userSnapshot = await userRef.get();
-
-        if (!userSnapshot.empty) {
-          const userData = userSnapshot.docs[0].data();
-          setUser(userData);
-          console.log( 'profile',  userData);
-          const uid = userSnapshot.docs[0].id;
-          await Promise.all([fetchUploads(uid), fetchAudioFiles(uid)]);
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
-
-    const fetchUploads = async (uid) => {
-      try {
-        const uploadsRef = firestore.collection('uploads').where('uid', '==', uid);
-        const uploadsSnapshot = await uploadsRef.get();
-
-        const userUploads = uploadsSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setUploads(userUploads);
-      } catch (error) {
-        console.error('Error fetching user uploads:', error);
-      }
-    };
-
-    const fetchAudioFiles = async (uid) => {
-      try {
-        const audioFilesRef = firestore.collection('audioFiles').where('uid', '==', uid);
-        const audioFilesSnapshot = await audioFilesRef.get();
-
-        const userAudioFiles = audioFilesSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setAudioFiles(userAudioFiles);
-      } catch (error) {
-        console.error('Error fetching user audio files:', error);
-      }
-    };
-
     fetchUserData();
   }, [username]);
 
@@ -91,40 +82,54 @@ const ProfilePage = () => {
     try {
       const userRef = firestore.collection('users').doc(user.id);
       const dataToUpdate = { bio: newBio };
-  
+
       if (newMood) {
         dataToUpdate.mood = newMood;
       }
-  
-      await userRef.update(dataToUpdate);
+
+      await userRef.set(dataToUpdate, { merge: true });
       setBio(newBio);
       setMood(newMood);
+
+      // Delay fetching the updated user data
+      setTimeout(() => {
+        fetchUserData();
+      }, 1000); // Adjust the delay time as needed
+
+      // Show success toast message
+      toast.success('User data updated successfully!', {
+        position: toast.POSITION.TOP_RIGHT,
+      });
     } catch (error) {
       console.error('Error updating user data:', error);
+      // Show error toast message
+      toast.error('Error updating user data. Please try again.', {
+        position: toast.POSITION.TOP_RIGHT,
+      });
     }
   };
-  
-  
+
   const isProfileOwner = currentUser && currentUser.uid === uploads[0]?.uid;
 
 
   return (
-    <div className="justify-items-center items-start mt-10">
-      {user && (
-        <div className="bg-white shadow-md rounded-md border w-full border-slate-100 p-6">
-          <img src={uploads[0]?.photoUrl} alt={user.username} className="w-20 h-20 rounded-full mx-auto mb-4" />
-          <p className="text-lg text-mono font-bold border rounded-full p-1 justify-center bg-stone-50 mb-1 tracking-widest text-blue-950">
-            {uploads[0]?.username}
-          </p>
-          <p className="text-sm bg-slate-500 border rounded-full text-white">
-            <span className="font-bold font-mono mt-2 text-sm"></span> {user.email}
-          </p>
-        
-        <div>
-         
-          <p> {user.bio}</p>
-          <p> {user.mood}</p>
+<div className="justify-items-center items-start mt-10">
+  {user && (
+    <div className="bg-white shadow-md rounded-md border w-full border-slate-100 p-6">
+      <img src={uploads[0]?.photoUrl} alt={user.username} className="w-20 h-20 rounded-full mx-auto mb-4" />
+      <p className="text-lg text-mono font-bold border rounded-full p-1 justify-center bg-stone-50 mb-1 tracking-widest text-blue-950">
+        {uploads[0]?.username}
+      </p>
+      <p className="text-sm bg-slate-500 border rounded-full text-white">
+        <span className="font-bold font-mono mt-2 text-sm"></span> {user.email}
+      </p>
+      
+      <div className="border-t mt-2 text-center">
+        <p className="font-mono text-xs border-b">{user.bio}</p>
+        <div className="flex justify-center items-center  my-4">
+          <p className="font-mono border font-extrabold bg-pink-600 animate p-4">{user.mood}</p>
         </div>
+      </div>
       
 
           {isProfileOwner && (
