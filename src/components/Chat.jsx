@@ -374,6 +374,10 @@ const playKick= () => {
   const handleFormToggle = () => {
     setFormVisible(!formVisible);
   };
+
+
+  
+ 
   
 
   return (

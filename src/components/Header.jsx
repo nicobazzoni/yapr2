@@ -100,7 +100,7 @@ const navigate = useNavigate();
 
   location.pathname.startsWith('/voicecall') ||
   location.pathname.startsWith('/chat') ? (
-    <RiHomeLine className="text-black ml-11 text-2xl p-1   cursor-pointer hover:bg-lime-500" onClick={backHome} />
+    <RiHomeLine className="text-black ml-11 text-2xl    cursor-pointer hover:bg-lime-500" onClick={backHome} />
   ) : (
     <a href={`/profile/${user.username}`} className="font-mono rounded-full hover:bg-blue-200 hover:text-red-500 p-1 text-black text-xs ml-8 font-bold bg-slate-100">
       {user.username}

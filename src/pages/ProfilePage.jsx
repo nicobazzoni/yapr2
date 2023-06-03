@@ -20,7 +20,7 @@ const ProfilePage = () => {
     try {
       const userRef = firestore.collection('users').where('username', '==', username);
       const userSnapshot = await userRef.get();
-
+  
       if (!userSnapshot.empty) {
         const userData = userSnapshot.docs[0].data();
         setUser(userData);
@@ -32,6 +32,18 @@ const ProfilePage = () => {
       console.error('Error fetching user data:', error);
     }
   };
+
+  const fetchUpdatedUserData = () => {
+    // Fetch updated user data every 10 seconds
+    setInterval(fetchUserData, 10000);
+  };
+
+  useEffect(() => {
+    fetchUserData();
+    fetchUpdatedUserData();
+  }, [username]);
+
+  
 
   const fetchUploads = async (uid) => {
     try {
@@ -77,39 +89,37 @@ const ProfilePage = () => {
     fetchUserData();
   }, [username]);
 
-  const handleBioUpdate = async (newBio, newMood) => {
-    try {
-      const userRef = firestore.collection('users').doc(user.id);
-      await userRef.update({ bio: newBio, mood: newMood });
-      setBio(newBio);
-      setMood(newMood);
-    } catch (error) {
-      console.error('Error updating bio:', error);
-    }
-  };
 
   const handleBioFormSubmit = async (newBio, newMood) => {
     try {
       const userRef = firestore.collection('users').doc(user.id);
-      const dataToUpdate = { bio: newBio };
-
-      if (newMood) {
-        dataToUpdate.mood = newMood;
-      }
-
-      await userRef.set(dataToUpdate, { merge: true });
+  
+      await userRef.update({ bio: newBio, mood: newMood });
       setBio(newBio);
       setMood(newMood);
-
+  
+      // Update the user object with the new bio and mood values
+      setUser((prevUser) => ({
+        ...prevUser,
+        bio: newBio,
+        mood: newMood
+      }));
+  
       // Delay fetching the updated user data
       setTimeout(() => {
         fetchUserData();
       }, 1000); // Adjust the delay time as needed
-
+  
       // Show success toast message
       toast.success('User data updated successfully!', {
         position: toast.POSITION.TOP_RIGHT,
       });
+  
+      // Refresh the page
+      setTimeout(() => {
+        fetchUserData();
+      }, 1000); // Adjust the delay time as needed
+      
     } catch (error) {
       console.error('Error updating user data:', error);
       // Show error toast message
@@ -118,29 +128,33 @@ const ProfilePage = () => {
       });
     }
   };
+  
+  
+  
+  
 
   const isProfileOwner = currentUser && currentUser.uid === uploads[0]?.uid;
 
 
   return (
-<div className="justify-items-center  items-start mt-10">
-  {user && (
-    <div className="bg-white shadow-md rounded-md border w-full border-slate-100 p-6">
-      <img src={uploads[0]?.photoUrl} alt={user.username} className="w-20 h-20 rounded-full mx-auto mb-4" />
-      <p className="text-lg text-mono font-bold border rounded-full p-1 justify-center bg-stone-50 mb-1 tracking-widest text-blue-950">
-        {uploads[0]?.username}
-      </p>
-      <p className="text-sm bg-slate-500 border rounded-full text-white">
-        <span className="font-bold font-mono mt-2 text-sm"></span> {user.email}
-      </p>
-      
-      <div className="border-t mt-2 text-center">
-        <p className="font-mono text-xs border-b">{user.bio}</p>
-        <div className="flex justify-center items-center  my-4">
-          <p className="font-mono border font-extrabold bg-blue-100 animate p-4">{user.mood}</p>
-        </div>
-      </div>
-      
+    <div className="justify-items-center  items-start mt-10">
+      {user && (
+        <div className="bg-white shadow-md rounded-md border w-full border-slate-100 p-6">
+          <img src={uploads[0]?.photoUrl} alt={user.username} className="w-20 h-20 rounded-full mx-auto mb-4" />
+          <p className="text-lg text-mono font-bold border rounded-full p-1 justify-center bg-stone-50 mb-1 tracking-widest text-blue-950">
+            {uploads[0]?.username}
+          </p>
+          <p className="text-sm bg-slate-500 border rounded-full text-white">
+            <span className="font-bold font-mono mt-2 text-sm"></span> {user.email}
+          </p>
+          
+          <div className="border-t mt-2 text-center">
+            <p className="font-mono text-xs border-b">{user.bio}</p>
+            <div className="flex justify-center items-center  my-4">
+              <p className="font-mono border font-extrabold bg-blue-100 animate p-4">{user.mood}</p>
+            </div>
+          </div>
+          
 
           {isProfileOwner && (
             <BioForm
@@ -148,15 +162,14 @@ const ProfilePage = () => {
               currentUser={currentUser}
               initialBio={bio}
               initialMood={mood}
-              onUpdate={handleBioUpdate}
-              isProfileOwner={isProfileOwner}
               onSubmit={handleBioFormSubmit}
+              isProfileOwner={isProfileOwner}
             />
           )}
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 justify-items-center items-start mt-4">
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 justify-items-center items-start mt-4">
         {uploads.map((upload) => (
           <div key={upload.id} className="bg-slate-100 space-y-2 w-full border border-slate-200 rounded-md p-1">
             <div className="h-36 w-full">
