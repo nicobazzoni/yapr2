@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { firestore } from '../../firebase';
 import { AuthContext } from '../contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const ReplyForm = ({ itemId,}) => {
   const [replyContent, setReplyContent] = useState('');
@@ -84,6 +85,8 @@ const ReplyForm = ({ itemId,}) => {
       setReplies(prevReplies => [...prevReplies, newReply]);
       console.log('Reply saved!', newReply)
       setReplyContent('');
+
+      toast.success('Reply saved!');
   
     } catch (error) {
       console.error('Error saving reply:', error);

@@ -7,7 +7,7 @@ import { v4 as uuid } from 'uuid';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
-const ReplyComponent = ({ recordingId, handleReplyButtonClick, fetchReplies }) => {
+const ReplyComponent = ({ recordingId, handleReplyButtonClick, fetchReplies, fetchAudioFilesAndReplies }) => {
   const [audioRecording, setAudioRecording] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
@@ -16,6 +16,7 @@ const ReplyComponent = ({ recordingId, handleReplyButtonClick, fetchReplies }) =
   const [user, setUser] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [replies, setReplies] = useState([]);
+
 
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -49,11 +50,7 @@ const ReplyComponent = ({ recordingId, handleReplyButtonClick, fetchReplies }) =
     }
   };
 
-  const handlePhotoChange = (e) => {
-    if (e.target.files[0]) {
-      setSelectedImage(e.target.files[0]);
-    }
-  };
+ 
 
 
   const handleStartRecording = () => {
@@ -93,6 +90,7 @@ const ReplyComponent = ({ recordingId, handleReplyButtonClick, fetchReplies }) =
     }
   };
 
+
   const handleSave = async () => {
     if (user && user.username && audioRecording && tag) {
       const filename = `${uuid()}.m4a`;
@@ -118,10 +116,8 @@ const ReplyComponent = ({ recordingId, handleReplyButtonClick, fetchReplies }) =
           photo: photo,
         });
   
-        toast.success('Reply saved successfully!');
         setTag('');
         handleReplyButtonClick('');
-        window.location.reload();
   
         // Fetch the updated replies for the parent post using fetchReplies and recordingId
         const updatedReplies = await fetchReplies(recordingId);
@@ -129,10 +125,14 @@ const ReplyComponent = ({ recordingId, handleReplyButtonClick, fetchReplies }) =
         // Update the replies state with the updated replies
         setReplies(updatedReplies);
   
+        showToast('Reply saved successfully!');
+        fetchAudioFilesAndReplies();
+        // Remove the window.location.reload() line
+  
         // Additional actions or logic after saving the reply
       } catch (error) {
         console.error('Error saving audio file:', error);
-        toast.error('Error saving audio file');
+        showToast('Error saving audio file');
       }
     } else {
       console.log('Missing user, audio recording, or tag');
@@ -140,6 +140,19 @@ const ReplyComponent = ({ recordingId, handleReplyButtonClick, fetchReplies }) =
   };
   
   
+  
+  
+  const showToast = (message) => {
+    toast(message, {
+      position: 'bottom-right',
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      draggable: true,
+    });
+  };
+
+
   
   
   

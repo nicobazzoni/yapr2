@@ -15,7 +15,7 @@ import './styles.css';
 import kick from '../assets/kick.wav';
 
 
-const Chat = () => {
+const Chat = ({showToast }) => {
   const [audioRecording, setAudioRecording] = useState(null);
   const audioRecorderRef = useRef(null);
   const audioPlayerRef = useRef(null);
@@ -30,6 +30,8 @@ const Chat = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [toastMessage, setToastMessage] = useState('');
+
 
   const [formVisible, setFormVisible] = useState(false); 
 
@@ -371,9 +373,8 @@ const playKick= () => {
     }
   };
   
-  const handleFormToggle = () => {
-    setFormVisible(!formVisible);
-  };
+ 
+  
 
 
   
@@ -511,6 +512,8 @@ const playKick= () => {
           handleReplyButtonClick={handleReplyButtonClick}
           fetchReplies={fetchReplies}
           audioFiles={audioFiles}
+          showToast={showToast}
+          fetchAudioFilesAndReplies={fetchAudioFilesAndReplies}
         />
       )}
 
