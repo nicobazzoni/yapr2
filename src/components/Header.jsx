@@ -85,9 +85,9 @@ const navigate = useNavigate();
    
 
   return (
-    <header className="flex align-items-center p-1 border-b   mb-3 justify-between"  style={{ backgroundImage: `url(${yicon})` }}>
-        <MdPeopleOutline className="text-black  cursor-pointer rounded-full hover:bg-blue-200" onClick={goToUsername} />
-        <HiOutlineMicrophone className="text-black  rounded-full hover:bg-blue-200 hover:animate-pulse cursor-pointer" onClick={goToVoicecall} />
+    <header className="flex align-items-center p-4 border-b   mb-3 justify-between"  style={{ backgroundImage: `url(${yicon})` }}>
+        <MdPeopleOutline className="text-black text-2xl cursor-pointer   rounded-full hover:bg-blue-200" onClick={goToUsername} />
+        <HiOutlineMicrophone className="text-black text-2xl   rounded-full hover:bg-blue-200 hover:animate-pulse cursor-pointer" onClick={goToVoicecall} />
       <nav className={`navbar ${isMenuOpen ? 'open' : ''}`}>
         
       <div className="navbar-brand flex p-1  items-center">
@@ -100,9 +100,9 @@ const navigate = useNavigate();
 
   location.pathname.startsWith('/voicecall') ||
   location.pathname.startsWith('/chat') ? (
-    <RiHomeLine className="text-black ml-11 cursor-pointer hover:bg-lime-500" onClick={backHome} />
+    <RiHomeLine className="text-black ml-11 text-2xl p-1   cursor-pointer hover:bg-lime-500" onClick={backHome} />
   ) : (
-    <a href={`/profile/${user.username}`} className="font-mono rounded-full hover:bg-blue-200 hover:text-red-500 text-black text-xs ml-8 font-bold bg-slate-100">
+    <a href={`/profile/${user.username}`} className="font-mono rounded-full hover:bg-blue-200 hover:text-red-500 p-1 text-black text-xs ml-8 font-bold bg-slate-100">
       {user.username}
     </a>
   )
@@ -114,7 +114,7 @@ const navigate = useNavigate();
   
 </div>
       </nav>
-      <ul className={`flex items-center justify-items-center  space-x-4 text-sm text-blue-500 ${isMenuOpen ? 'open' : ''}`}>
+      <ul className={`flex items-center justify-items-center text-2xl   space-x-4  text-blue-500 ${isMenuOpen ? 'open' : ''}`}>
         {user ? (
         <li>
         <span className="relative">

@@ -185,7 +185,9 @@ const playKick= () => {
   
         setTag('');
         setSelectedImage(null); // Reset selected image state
-        handleReplyButtonClick(''); // Call the handleReplyButtonClick function with an empty string
+        handleReplyButtonClick(''); 
+       
+        toast.success('Yap shared successfully!');
       } catch (error) {
         console.error('Error saving audio file:', error);
       }
@@ -203,52 +205,54 @@ const playKick= () => {
     try {
       const repliesSnapshot = await firestore
         .collection('audioReplies')
-        .where('parentPostId', '==', audioFileId)
+        .where('parentPostId', '==', audioFileId || '') // Provide a fallback value if audioFileId is undefined
         .orderBy('createdAt', 'asc')
         .get();
-
+  
       const repliesData = repliesSnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
- console.log('repliesData', repliesData);
+  
       return repliesData;
-     
     } catch (error) {
       console.error('Error fetching replies:', error);
       return [];
     }
   };
+  
+  
 
+  const fetchAudioFilesAndReplies = async () => {
+    try {
+      const audioFilesSnapshot = await firestore
+        .collection('audioFiles')
+        .orderBy('createdAt', 'desc')
+        .get();
+  
+      const audioFilesData = audioFilesSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+  
+      const audioFilesWithReplies = await Promise.all(
+        audioFilesData.map(async (audioFile) => {
+          const repliesData = await fetchReplies(audioFile.id); // Pass audioFile.id as the parameter
+          return { ...audioFile, replies: repliesData };
+        })
+      );
+  
+      setAudioFiles(audioFilesWithReplies);
+      console.log('audioFilesWithReplies', audioFilesWithReplies);
+    } catch (error) {
+      console.error('Error fetching audio files and replies:', error);
+    }
+  };
+  
   useEffect(() => {
-    const fetchAudioFilesAndReplies = async () => {
-      try {
-        const audioFilesSnapshot = await firestore
-          .collection('audioFiles')
-          .orderBy('createdAt', 'desc')
-          .get();
-  
-        const audioFilesData = audioFilesSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-  
-        const audioFilesWithReplies = await Promise.all(
-          audioFilesData.map(async (audioFile) => {
-            const repliesData = await fetchReplies(audioFile.id); // Pass audioFile.id as the parameter
-            return { ...audioFile, replies: repliesData };
-          })
-        );
-  
-        setAudioFiles(audioFilesWithReplies);
-        console.log('audioFilesWithReplies', audioFilesWithReplies);
-      } catch (error) {
-        console.error('Error fetching audio files and replies:', error);
-      }
-    };
-  
     fetchAudioFilesAndReplies();
   }, []);
+  
   
   
 
@@ -269,7 +273,7 @@ const playKick= () => {
   };
 
   const handlePlayReply = (url, file, reply) => {
-    setAudioPlaying(true);
+   
     setIsPlaying(true);
   
     const { username, tag } = reply;
@@ -314,27 +318,34 @@ const playKick= () => {
   };
   
   
-
   const handleReplyDelete = async (id, username) => {
     if (user && user.username === username) {
       try {
         await firestore.collection('audioReplies').doc(id).delete();
         console.log('Document successfully deleted!');
-        
+  
         // Update the state by removing the deleted reply from the replies array
         setReplies((prevReplies) => prevReplies.filter((reply) => reply.id !== id));
-        
+  
         // Fetch the updated audio files and replies
         fetchAudioFilesAndReplies();
+        toast.success('Reply deleted successfully!');
       } catch (error) {
         console.error('Error removing document: ', error);
-        // handle the error
+        // Handle the error
       }
     } else {
       console.log('You are not authorized to delete this document.');
-      // handle the error
+      // Handle the error
     }
   };
+  
+  
+  
+  
+  
+  
+  
   
 
   const CustomToast = ({ closeToast }) => (
@@ -480,48 +491,39 @@ const playKick= () => {
   onClick={() => handlePlayAudio(file.url, file)}
 >
   <h1 className="text-xs font-bold text-stone-500 font-mono">Listen</h1>
-        
-       
-
-        
-      </div>
-
-
- 
-
-
+        </div>
               {/* Reply component */}
-              <div className="border lg:w-1/2 border-spacing-14" />
+  <div className="border lg:w-1/2 border-spacing-14" />
 
-              <button
-                className="bg-blue-200 hover:bg-blue-400 text-white py-1 px-2 rounded focus:outline-none mt-2"
-                onClick={() => handleReplyButtonClick(file.id)}
-              >
-                Reply
-              </button>
-              {showReply && file.id === replyRecordingId && (
-                <ReplyComponent
-                  recordingId={replyRecordingId}
-                  handleReplyButtonClick={handleReplyButtonClick}
-                  fetchReplies={fetchReplies}
-                  audioFiles={audioFiles}
-                />
-              )}
+      <button
+        className="bg-blue-200 hover:bg-blue-400 text-white py-1 px-2 rounded focus:outline-none mt-2"
+        onClick={() => handleReplyButtonClick(file.id)}
+      >
+        Reply
+      </button>
+      {showReply && file.id === replyRecordingId && (
+        <ReplyComponent
+          recordingId={replyRecordingId}
+          handleReplyButtonClick={handleReplyButtonClick}
+          fetchReplies={fetchReplies}
+          audioFiles={audioFiles}
+        />
+      )}
 
-              <h1 className="font-mono text-xs text-stone-500 border-t   text-bold">Replies</h1>
-              {file.replies &&
+      <h1 className="font-mono text-xs text-stone-500 border-t   text-bold">Replies</h1>
+      {file.replies &&
   file.replies.map((reply) => (
     <div
       key={reply.id}
-      className="mt-4 relative bg-slate-50 p-4 rounded-md shadow-md hover:bg-yellow-200 cursor-pointer"
-      onClick={() => handlePlayReply(reply.url, file, reply)}
+      className="mt-4 relative bg-slate-50 p-4 rounded-md shadow-md hover:bg-yellow-200 cursor-pointer flex justify-between items-center"
+      
     >
-      <div className="relative">
+      <div  style={{ width: '80%' }} className="relative">
         <div
           className="bg-cover bg-center mt-2 shadow-slate-400 shadow-lg w-10 h-10 rounded-full"
           style={{ backgroundImage: `url(${reply.photo})` }}
         ></div>
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div onClick={() => handlePlayReply(reply.url, file, reply)} className="absolute inset-0 flex items-center justify-center">
           {reply.tag && (
             <div className="bg-white text-gray-800 hover:bg-blue-400 py-1 px-2 rounded">
               {reply.tag}
@@ -532,7 +534,7 @@ const playKick= () => {
       <p className="text-gray-600 text-xs font-mono mt-1">
         {format(reply.createdAt.toDate(), 'MM·dd·yy - h:mm a')}
       </p>
-      <div className="absolute top-0 right-0 transform translate-x-2 -translate-y-2">
+      <div className="absolute top-0 right-0 transform translate-x-2 -translate-y-2 ">
         <a
           href={`/profile/${reply.username}`}
           className="bg-blue-500 text-white px-2 py-1 rounded font-medium"
@@ -540,22 +542,23 @@ const playKick= () => {
           {reply.username}
         </a>
       </div>
-      {user && user.username === file.username && (
-        <div className="mt-4 absolute top-0 left-0 transform -translate-x-1 translate-y-1">
-          <MdDelete
-            className="bg-red-500 hover:bg-red-600 text-white py-1 px-2 text-xs rounded focus:outline-none"
-            onClick={() => handleReplyDelete(reply.id, reply.username)}
-          />
+      {user && user.username === reply.username && (
+        <div className="mt-4 absolute top-0 right-0 transform translate-x-1 translate-y-1">
+          <div className="delete-button-container" style={{ position: 'relative', zIndex: '10', marginTop: '10px', textAlign: 'right' }}>
+            <div style={{ display: 'inline-block' }}>
+              <MdDelete
+                className="bg-red-500 hover:bg-red-600 text-white py-1 px-2 text-xs rounded focus:outline-none"
+                onClick={() => handleReplyDelete(reply.id, reply.username, file)}
+              />
+            </div>
+          </div>
         </div>
       )}
     </div>
+    
   ))}
-
-
-
 </div>
-
-  ))}
+))}
 </div>
 </div>
 </div>

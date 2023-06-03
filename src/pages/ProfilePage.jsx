@@ -52,16 +52,26 @@ const ProfilePage = () => {
     try {
       const audioFilesRef = firestore.collection('audioFiles').where('uid', '==', uid);
       const audioFilesSnapshot = await audioFilesRef.get();
-
-      const userAudioFiles = audioFilesSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+  
+      const userAudioFiles = audioFilesSnapshot.docs.map((doc) => {
+        const audioFileData = doc.data();
+        const { image, createdAt, url } = audioFileData; // Destructure the photoUrl and createdAt properties
+        return {
+          id: doc.id,
+          image, // Include the photoUrl property in the object
+          createdAt,
+          url, // Include the createdAt property in the object
+        
+        };
+      });
+  
       setAudioFiles(userAudioFiles);
+      console.log('audio', userAudioFiles);
     } catch (error) {
       console.error('Error fetching user audio files:', error);
     }
   };
+  
 
   useEffect(() => {
     fetchUserData();
@@ -113,7 +123,7 @@ const ProfilePage = () => {
 
 
   return (
-<div className="justify-items-center items-start mt-10">
+<div className="justify-items-center  items-start mt-10">
   {user && (
     <div className="bg-white shadow-md rounded-md border w-full border-slate-100 p-6">
       <img src={uploads[0]?.photoUrl} alt={user.username} className="w-20 h-20 rounded-full mx-auto mb-4" />
@@ -127,7 +137,7 @@ const ProfilePage = () => {
       <div className="border-t mt-2 text-center">
         <p className="font-mono text-xs border-b">{user.bio}</p>
         <div className="flex justify-center items-center  my-4">
-          <p className="font-mono border font-extrabold bg-pink-600 animate p-4">{user.mood}</p>
+          <p className="font-mono border font-extrabold bg-blue-100 animate p-4">{user.mood}</p>
         </div>
       </div>
       
@@ -168,19 +178,22 @@ const ProfilePage = () => {
             )}
           </div>
         ))}
-      </div>
+      </div> 
 
       <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Audio Files</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
-          {audioFiles.map((audioFile) => (
-            <div key={audioFile.id} className="bg-slate-100 space-y-2 w-full border border-slate-200 rounded-md p-1">
-              <audio src={audioFile.url} controls className="w-full"></audio>
-              <p className="text-gray-600 bg-white text-center">{audioFile.tag}</p>
-            </div>
-          ))}
-        </div>
+  <h2 className="text-2xl font-bold mb-4">Audio Files</h2>
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
+    {audioFiles.map((audioFile) => (
+      <div key={audioFile.id} className="bg-slate-100 space-y-2 w-full border border-slate-200 rounded-md p-1">
+        <p className="text-gray-600 bg-white text-center">{audioFile.tag}</p>
+        <p className="text-gray-600 bg-white text-center">{audioFile.createdAt.toDate().toLocaleDateString()}</p>
+        <img src={audioFile.image} alt={audioFile.username} className="w-full h-72 object-cover rounded" />
+        <audio src={audioFile.url} controls className="w-full"></audio>
       </div>
+    ))}
+  </div>
+</div>
+
     </div>
   );
 };

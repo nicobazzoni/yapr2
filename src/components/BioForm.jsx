@@ -46,29 +46,32 @@ const FormComponent = ({ onSubmit }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="bio">Bio:</label>
+    <form onSubmit={handleSubmit} className='items-center'>
+      <div className='font-mono flex-items'>
+        <label className='mb-5 flex justify-center' htmlFor="bio">Bio:</label>
         <textarea
+          className='border-2 border-black outline-none p-2'
           id="bio"
           value={bio}
           onChange={(e) => setBio(e.target.value)}
         ></textarea>
       </div>
-      <div>
-        <label htmlFor="mood">Mood:</label>
+      <div className='font-mono flex-items'>
+        <label className='mb-5 flex justify-center' htmlFor="mood">Mood:</label>
         <input
           type="text"
           id="mood"
+          className='border-2 border-black outline-none p-2'
           value={mood}
           onChange={(e) => setMood(e.target.value)}
         />
       </div>
-      <button type="submit" disabled={isLoading}>
+      <button className='border rounded-full p-2 mt-3 font-mono' type="submit" disabled={isLoading}>
         {isLoading ? 'Saving...' : 'Save'}
       </button>
     </form>
   );
 };
+  
 
 export default FormComponent;
