@@ -5,6 +5,7 @@ import LikeButton from '../components/LikeButton';
 import BioForm from '../components/BioForm';
 import { AuthContext } from '../contexts/AuthContext';
 import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
 
 const ProfilePage = () => {
   const { username } = useParams();
@@ -13,6 +14,9 @@ const ProfilePage = () => {
   const [audioFiles, setAudioFiles] = useState([]);
   const [bio, setBio] = useState('');
   const [mood, setMood] = useState('');
+  const [followers, setFollowers] = useState([]);
+const [following, setFollowing] = useState([]);
+
 
   const { currentUser } = useContext(AuthContext);
 
@@ -24,10 +28,18 @@ const ProfilePage = () => {
       if (!userSnapshot.empty) {
         const userData = userSnapshot.docs[0].data();
         setUser(userData);
-        console.log('profile', userData);
         const uid = userSnapshot.docs[0].id;
-        await Promise.all([fetchUploads(uid), fetchAudioFiles(uid)]);
+        await Promise.all([
+          fetchUploads(uid), 
+          fetchAudioFiles(uid),
+          fetchFollowers(uid),
+          fetchFollowing(uid)
+        ]);
       }
+      
+      
+
+      
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
@@ -67,12 +79,13 @@ const ProfilePage = () => {
   
       const userAudioFiles = audioFilesSnapshot.docs.map((doc) => {
         const audioFileData = doc.data();
-        const { image, createdAt, url } = audioFileData; // Destructure the photoUrl and createdAt properties
+        const { image, createdAt, url, tag } = audioFileData; // Destructure the photoUrl and createdAt properties
         return {
           id: doc.id,
           image, // Include the photoUrl property in the object
           createdAt,
-          url, // Include the createdAt property in the object
+          url,
+          tag, // Include the createdAt property in the object
         
         };
       });
@@ -127,6 +140,25 @@ const ProfilePage = () => {
         position: toast.POSITION.TOP_RIGHT,
       });
     }
+  };
+  
+
+  const fetchFollowers = async (uid) => {
+    const followersRef = firestore.collection('users').where('followers', 'array-contains', uid);
+    const followersSnapshot = await followersRef.get();
+    console.log(followersSnapshot.docs);
+    const followerData = followersSnapshot.docs.map(doc => doc.data());
+    setFollowers(followerData);
+    console.log('followers', followerData);
+  };
+  
+  const fetchFollowing = async (uid) => {
+    const followingRef = firestore.collection('users').where('following', 'array-contains', uid);
+    const followingSnapshot = await followingRef.get();
+    console.log(followingSnapshot.docs);
+    const followingData = followingSnapshot.docs.map(doc => doc.data());
+    setFollowing(followingData);
+    console.log('following', followingData);
   };
   
   
@@ -194,7 +226,7 @@ const ProfilePage = () => {
       </div> 
 
       <div className="mt-8">
-  <h2 className="text-2xl font-bold mb-4">Audio Files</h2>
+  <h2 className="text-2xl font-bold mb-4 bg-lime-200">Yaps</h2>
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
     {audioFiles.map((audioFile) => (
       <div key={audioFile.id} className="bg-slate-100 space-y-2 w-full border border-slate-200 rounded-md p-1">
@@ -206,6 +238,34 @@ const ProfilePage = () => {
     ))}
   </div>
 </div>
+
+{user && (
+  <div className='space-x-2'>
+    <h1 className='font-mono bg-black text-white'>Listening list</h1>
+    <div className='flex justify-between items-center'> 
+      <div>
+        <h2 className='border rounded-md p-2 font-serif tracking-wider bg-blue-100'> {user.username}'s Listeners</h2>
+        <ul className=''>
+          {followers.map(follower => (
+            <li key={follower.id}> {follower.username}</li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <h2 className='border rounded-md font-serif tracking-wider p-1 bg-white'> {user.username} Listens to</h2>
+        <ul className='mt-2 border-b border-black '>
+          {following.map(following => (
+            <li className=' border-b border-black font-mono tracking-widest font-bold bg-blue-100' key={following.id}> 
+              <Link className='hover:bg-blue-200 p-2 ' to={`/profile/${following.username}`}>{following.username}</Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+)}
+
+
 
     </div>
   );

@@ -97,7 +97,7 @@ const Feed = ({}) => {
 
   return (
     <div>
-      <h1 className="text-xs font-bold text-start font-mono text-blue-200">yaps</h1>
+      <h1 className="text-xs font-bold text-start font-mono text-blue-200 border-b mb-2">posts</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {uploads.map(({ id, upload, uid }) => {

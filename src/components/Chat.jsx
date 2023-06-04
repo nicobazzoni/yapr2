@@ -447,7 +447,7 @@ const playKick= () => {
         <audio ref={audioPlayerRef} src={URL.createObjectURL(audioRecording.blob)} />
       )}
        
-      <div className="container mx-auto mt-8">
+      <div className="container mx-auto  mt-8">
         <h2 className="text-2xl text-blue-200 p-1 font-mono font-bold mb-1">yaps</h2>
 
         <div className="">
@@ -463,7 +463,7 @@ const playKick= () => {
             {format(file.createdAt.toDate(), 'MM·dd·yy - h:mm a')}
           </p>
         )}
-  <a href={`/profile/${file.username}`} className="text-gray-600 text-xs bg-slate-50 hover:bg-rose-500 font-mono shadow-md rounded-full max-w-fit p-2">
+  <a href={`/profile/${file.username}`} className="text-gray-600 text-xs bg-slate-50 hover:bg-rose-500 font-mono shadow-md  rounded-full max-w-fit p-2">
     {file.username}
   </a>
 
@@ -480,7 +480,7 @@ const playKick= () => {
 
         </button>
       </div>
-      <div className="flex justify-between  items-center bg-white">
+      <div className="flex justify-between  items-center  bg-white">
 
         
         {user && user.username === file.username && (
@@ -498,7 +498,7 @@ const playKick= () => {
   <h1 className="text-xs font-bold text-stone-500 font-mono">Listen</h1>
         </div>
               {/* Reply component */}
-  <div className="border lg:w-1/2 border-spacing-14" />
+  <div className="border lg:w-1/2 border-spacing-14  " />
 
       <button
         className="bg-blue-200 hover:bg-blue-400 text-white py-1 px-2 rounded focus:outline-none mt-2"
@@ -517,7 +517,7 @@ const playKick= () => {
         />
       )}
 
-      <h1 className="font-mono text-xs text-stone-500 border-t   text-bold">Replies</h1>
+      <h1 className="font-mono text-xs text-stone-500 border-t  text-bold">Replies</h1>
       {file.replies &&
   file.replies.map((reply) => (
     <div

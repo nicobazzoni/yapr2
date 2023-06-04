@@ -14,14 +14,13 @@ const FollowButton = ({ userId }) => {
     const checkFollowStatus = async () => {
       try {
         if (currentUser) {
-          const followerId = currentUser.uid;
-          const followDoc = await firestore
-            .collection('followers')
-            .where('followerId', '==', followerId)
-            .where('followedId', '==', userId)
-            .get();
+          const userRef = firestore.collection('users').doc(currentUser.uid);
+          const userSnapshot = await userRef.get();
 
-          setIsFollowing(!followDoc.empty);
+          if (userSnapshot.exists) {
+            const userFollowing = userSnapshot.data().following || [];
+            setIsFollowing(userFollowing.includes(userId));
+          }
         }
       } catch (error) {
         console.error('Error checking follow status:', error);
@@ -45,72 +44,43 @@ const FollowButton = ({ userId }) => {
     checkFollowStatus();
     fetchUserData();
   }, [currentUser, userId]);
-// ...
 
-const handleFollow = async () => {
-  try {
-    const followerId = currentUser.uid;
-    const followedId = userId;
+  const handleFollow = async () => {
+    try {
+      const followerId = currentUser.uid;
+      const followedId = userId;
 
-    // Fetch the username of the user being followed
-    const followedUserSnapshot = await firestore.collection('users').doc(followedId).get();
-    const followedUser = followedUserSnapshot.data();
-    const followedUsername = followedUser.username;
-
-    // Create a new document in the "followers" collection
-    await firestore.collection('followers').doc().set({
-      followerId: followerId,
-      followedId: followedId,
-      followedUsername: followedUsername,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    // Update the user's "following" collection with the followed user's username
-    await firestore
-      .collection('users')
-      .doc(followerId)
-      .collection('following')
-      .doc(followedId)
-      .set({
-        followedUsername: followedUsername,
-        followedId: followedId,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      // Add the followerId to the followed user's "followers" field
+      await firestore.collection('users').doc(followedId).update({
+        followers: firebase.firestore.FieldValue.arrayUnion(followerId),
       });
 
-    setIsFollowing(true);
-    console.log('User followed successfully!');
-  } catch (error) {
-    console.error('Error following user:', error);
-  }
-};
+      // Add the followedId to the current user's "following" field
+      await firestore.collection('users').doc(followerId).update({
+        following: firebase.firestore.FieldValue.arrayUnion(followedId),
+      });
 
-// ...
-
+      setIsFollowing(true);
+      console.log('User followed successfully!');
+    } catch (error) {
+      console.error('Error following user:', error);
+    }
+  };
 
   const handleUnfollow = async () => {
     try {
       const followerId = currentUser.uid;
       const followedId = userId;
 
-      // Delete the document representing the follow relationship
-      await firestore
-        .collection('followers')
-        .where('followerId', '==', followerId)
-        .where('followedId', '==', followedId)
-        .get()
-        .then((snapshot) => {
-          snapshot.forEach((doc) => {
-            doc.ref.delete();
-          });
-        });
+      // Remove the followerId from the followed user's "followers" field
+      await firestore.collection('users').doc(followedId).update({
+        followers: firebase.firestore.FieldValue.arrayRemove(followerId),
+      });
 
-      // Delete the document in the "following" collection
-      await firestore
-        .collection('users')
-        .doc(followerId)
-        .collection('following')
-        .doc(followedId)
-        .delete();
+      // Remove the followedId from the current user's "following" field
+      await firestore.collection('users').doc(followerId).update({
+        following: firebase.firestore.FieldValue.arrayRemove(followedId),
+      });
 
       setIsFollowing(false);
       console.log('User unfollowed successfully!');
