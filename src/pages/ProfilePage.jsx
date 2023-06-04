@@ -170,7 +170,7 @@ const [following, setFollowing] = useState([]);
 
   return (
     <div className="justify-items-center  items-start mt-10">
-      {user && (
+      {user && uploads.length > 0 && (
         <div className="bg-white shadow-md rounded-md border w-full border-slate-100 p-6">
           <img src={uploads[0]?.photoUrl} alt={user.username} className="w-20 h-20 rounded-full mx-auto mb-4" />
           <p className="text-lg text-mono font-bold border rounded-full p-1 justify-center bg-stone-50 mb-1 tracking-widest text-blue-950">
@@ -226,7 +226,7 @@ const [following, setFollowing] = useState([]);
       </div> 
 
       <div className="mt-8">
-  <h2 className="text-2xl font-bold mb-4 bg-lime-200">Yaps</h2>
+  <h2 className="text-2xl font-bold mb-4 bg-rose-400"> <span className='text-white'>{user && user.username}'s</span>  Yaps</h2>
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
     {audioFiles.map((audioFile) => (
       <div key={audioFile.id} className="bg-slate-100 space-y-2 w-full border border-slate-200 rounded-md p-1">
@@ -241,13 +241,15 @@ const [following, setFollowing] = useState([]);
 
 {user && (
   <div className='space-x-2'>
-    <h1 className='font-mono bg-black text-white'>Listening list</h1>
+    <h1 className='font-mono bg-black mt-4 text-white mb-2'>Listening list</h1>
     <div className='flex justify-between items-center'> 
-      <div>
-        <h2 className='border rounded-md p-2 font-serif tracking-wider bg-blue-100'> {user.username}'s Listeners</h2>
-        <ul className=''>
+      <div className=''>
+        <h2 className='border rounded-md p-2 font-serif tracking-wider bg-white'> {user.username}'s Listeners</h2>
+        <ul className='mt-2 border-b border-black '>
           {followers.map(follower => (
-            <li key={follower.id}> {follower.username}</li>
+            <li className='  border-black mb-1 font-mono tracking-widest font-bold bg-blue-100'  key={follower.id}>
+            <Link className='hover:bg-blue-200 p-2  ' to={`/profile/${follower.username}`}>{follower.username}</Link>
+            </li>
           ))}
         </ul>
       </div>
@@ -255,7 +257,7 @@ const [following, setFollowing] = useState([]);
         <h2 className='border rounded-md font-serif tracking-wider p-1 bg-white'> {user.username} Listens to</h2>
         <ul className='mt-2 border-b border-black '>
           {following.map(following => (
-            <li className=' border-b border-black font-mono tracking-widest font-bold bg-blue-100' key={following.id}> 
+            <li className='  border-black font-mono tracking-widest mb-1 font-bold bg-blue-100' key={following.id}> 
               <Link className='hover:bg-blue-200 p-2 ' to={`/profile/${following.username}`}>{following.username}</Link>
             </li>
           ))}

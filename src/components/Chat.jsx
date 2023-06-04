@@ -490,13 +490,14 @@ const playKick= () => {
           />
         )}
       </div>
-      <div
+      <audio
   className={`w-full bg-gray-100 p-2 rounded-md shadow-md mb-3 outline-none hover:bg-blue-200 cursor-pointer `}
-
+  controls
+  src={file.url}
   onClick={() => handlePlayAudio(file.url, file)}
 >
   <h1 className="text-xs font-bold text-stone-500 font-mono">Listen</h1>
-        </div>
+</audio>
               {/* Reply component */}
   <div className="border lg:w-1/2 border-spacing-14  " />
 
