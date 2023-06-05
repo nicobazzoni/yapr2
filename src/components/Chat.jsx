@@ -511,7 +511,7 @@ const playKick= () => {
   controls
   src={file.url}
   ref={audioRef}
-  onClick={() => handlePlayAudio(file.url, file)}
+  // onClick={() => handlePlayAudio(file.url, file)}
 >
   <h1 className="text-xs font-bold text-stone-500 font-mono">Listen</h1>
 </audio>
