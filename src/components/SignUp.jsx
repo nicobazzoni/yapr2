@@ -2,69 +2,72 @@ import React, { useState } from 'react';
 import { useRef } from 'react';
 import yicon from '../assets/yicon.jpg';
 import { auth, firestore } from '../../firebase';
-import { useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { readAndCompressImage } from 'browser-image-resizer';
 
 const SignUp = () => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
-  const [photoURL, setPhotoURL] = useState(null); // New state for photo URL
+  const [photoURL, setPhotoURL] = useState(null);
   const [error, setError] = useState(null);
 
-const navigation = useNavigate()
+  const navigation = useNavigate()
 
-const handleSignUp = async () => {
-  try {
-    if (!email || !password || !username || !photoURL) {
-      setError('Please fill in all required fields');
-      return;
+  const handleSignUp = async () => {
+    try {
+      if (!email || !password || !username || !photoURL) {
+        setError('Please fill in all required fields');
+        return;
+      }
+
+      const { user } = await auth.createUserWithEmailAndPassword(email, password);
+      if (user) {
+        await firestore.collection('users').doc(user.uid).set({
+          email,
+          username,
+          photoURL,
+          likes: [],
+          followers: [],
+          following: [],
+          bio: null,
+          mood: null,
+        });
+        navigation('/');
+      }
+    } catch (error) {
+      setError('Error signing up. Please try again later.');
+      console.error('Error signing up:', error);
+      toast.error(`Error signing up: ${error.message}`);
     }
-
-    const { user } = await auth.createUserWithEmailAndPassword(email, password);
-    if (user) {
-      await firestore.collection('users').doc(user.uid).set({
-        email,
-        username,
-        photoURL,
-        likes: [],
-        followers: [],
-        following: [],
-        bio: null,
-        mood: null,
-      });
-      navigation('/');
-    }
-  } catch (error) {
-    setError('Error signing up. Please try again later.');
-    console.error('Error signing up:', error);
-    toast.error(`Error signing up: ${error.message}`);
-  }
-};
-
-
-
-const handlePhotoUpload = (event) => {
-  const file = event.target.files[0];
-
-  // Check if file size exceeds the limit (e.g., 2MB)
-  const fileSizeLimit = 5 * 1024 * 1024; // 5MB in bytes
-
-  if (file.size > fileSizeLimit) {
-    // Display an error message or take appropriate action
-    console.log('File size exceeds the limit');
-    return;
-  }
-
-  const reader = new FileReader();
-
-  reader.onload = (event) => {
-    setPhotoURL(event.target.result); // Set the photo URL in state
   };
 
-  reader.readAsDataURL(file);
-};
+  const handlePhotoUpload = async (event) => {
+    const file = event.target.files[0];
+
+    const config = {
+      quality: 0.8,
+      maxWidth: 800,
+      maxHeight: 800,
+      autoRotate: true,
+      debug: true,
+    };
+
+    try {
+      const resizedImage = await readAndCompressImage(file, config);
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        setPhotoURL(event.target.result);
+      };
+
+      reader.readAsDataURL(resizedImage);
+    } catch (error) {
+      console.error('Error resizing image: ', error);
+    }
+  };
 
 
   return (
