@@ -15,7 +15,7 @@ import './styles.css';
 import kick from '../assets/kick.wav';
 
 
-const Chat = ({showToast }) => {
+const Chat = ({ showToast }) => {
   const [audioRecording, setAudioRecording] = useState(null);
   const audioRecorderRef = useRef(null);
   const audioPlayerRef = useRef(null);

@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import yicon from '../assets/yicon.jpg';
 import { auth, firestore } from '../../firebase';
 import { useNavigate} from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const SignUp = () => {
 
@@ -38,6 +39,7 @@ const handleSignUp = async () => {
   } catch (error) {
     setError('Error signing up. Please try again later.');
     console.error('Error signing up:', error);
+    toast.error(`Error signing up: ${error.message}`);
   }
 };
 
